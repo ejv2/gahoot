@@ -1,0 +1,6 @@
+# Compiled binaries
+gahoot
+
+# We write exclusively in TypeScript
+frontend/static/js/*
+*.js

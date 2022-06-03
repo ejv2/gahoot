@@ -1,0 +1,33 @@
+# Gahoot! - A Distributed Version of Kahoot!
+
+Gahoot! is a distributed and self-hostable rewrite of [Kahoot!](https://kahoot.com/) in Go. It is designed to be slightly more minimal and to implement the core features that everybody loves without the fluff and bloat. It is also designed to be easy to self-host on your machine, meaning that anybody can set up an instance for their school or class or just friends to play on. Instances are also designed to be very configurable for the host, so that features can be toggled on or off and the complexities of the game tweaked.
+
+> **Important note:** Although this is inspired by [Kahoot!](https://kahoot.com/), it is **not affiliated** with them. This project uses *absolutely no* Kahoot! assets and is a *complete rewrite from scratch*. This is my own personal project - nothing official.
+
+## Design goals
+
+* To provide an experience as close to mainline Kahoot! as I can manage (see exceptions below)
+* To allow anybody to set up an instance and anybody to play on any instance
+* To provide a minimal, high-performance version of the game which can function on almost any device
+
+## Design document
+
+There is a design document that I wrote in "DESIGN". It is formatted in GROFF MS format, as I wrote this as part of a school project, but its apparently quite interesting to many. To view it, use the following pipeline:
+
+```bash
+groff -ms -Tpdf DESIGN | zathura -
+```
+
+If the above doesn't work for you or if you are really having troble compiling the design document, just email me (see committer email) and I'll be happy to email you a PDF or PostScript copy.
+
+## Contributions
+
+Always welcome. Please stick to the style guides outlined in the ``.editorconfig`` file. If possible, use a plugin for your editor to respect this configuration. Basically:
+
+* **ALWAYS** use LF line endings - I cannot stand CRLF
+* Tabs size eight for Go, HTML, CSS or anything not mentioned
+* Spaces size four for TypeScript
+* Space size 2 for most JSON and all YML files
+
+---
+vim: ft=markdown

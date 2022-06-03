@@ -1,0 +1,23 @@
+{
+  "name": "gahoot",
+  "version": "0.0.1",
+  "description": "Distributed, FOSS rewrite of Kahoot in Go",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ethanv2/gahoot.git"
+  },
+  "keywords": [
+    "game",
+    "education"
+  ],
+  "author": "Ethan Marshall <ethan@ethanjmarshall.co.uk>",
+  "license": "AGPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/ethanv2/gahoot/issues"
+  },
+  "homepage": "https://github.com/ethanv2/gahoot#readme"
+}
