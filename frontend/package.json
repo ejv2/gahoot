@@ -4,7 +4,8 @@
   "description": "Distributed, FOSS rewrite of Kahoot in Go",
   "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
