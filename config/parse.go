@@ -16,9 +16,9 @@ var (
 	ErrParse      = errors.New("config: parse error")
 )
 
-// parse advances through the config file, extracting one config key
-// per line. Keys are separated from content by a single ':' (colon).
-// Any UTF-8 text can be placed around the colon and will be handled.
+// parse advances through the config file, extracting one config key per line.
+// Keys are separated from content by a single ':' (colon). Any UTF-8 text can
+// be placed around the colon and will be handled.
 func parse(c *Config, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
