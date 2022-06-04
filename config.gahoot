@@ -1,0 +1,11 @@
+// Example Gahoot config
+//
+// Keys are formed by placing the config key before a colon and the
+// desired value after. Eg:
+//	key: "value pair"
+// Lines beginning with "//" or which are blank are discarded
+// Not all options are required. They can be omitted or left blank.
+
+// Network settings
+addr: 0.0.0.0
+port: 8080
