@@ -28,6 +28,9 @@ watch:
 	find -name "*.go" -print -or -name "*.ts" -print -or -name "node_modules" -prune \
 		| entr -cs "pkill gahoot; make; ./gahoot &"; pkill gahoot
 
+frontwatch:
+	cd frontend && npm run watch
+
 clean:
 	rm -f ${EXE}
 	rm -rf frontend/static/js/
