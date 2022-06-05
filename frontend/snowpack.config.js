@@ -3,11 +3,9 @@
 
 /** @type {import("snowpack").SnowpackUserConfig } */
 module.exports = {
-    root: "src/",
+    root: "./.genjs/",
+    exclude: ["**/node_modules/**/*", "*.ts", "*.tsbuildinfo"],
     buildOptions: {
-        out: "static/js/"
+        out: "./static/js/"
     },
-    plugins: [
-        '@snowpack/plugin-typescript'
-    ]
 };

@@ -4,3 +4,4 @@ gahoot
 # We write exclusively in TypeScript
 frontend/node_modules/*
 frontend/static/js/*
+frontend/.genjs/*

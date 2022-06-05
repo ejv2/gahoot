@@ -34,5 +34,6 @@ frontwatch:
 clean:
 	rm -f ${EXE}
 	rm -rf frontend/static/js/
+	rm -rf frontend/.genjs/
 
 .PHONY: clean watch frontend server

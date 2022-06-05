@@ -4,6 +4,7 @@
   "description": "Distributed, FOSS rewrite of Kahoot in Go",
   "main": "src/index.ts",
   "scripts": {
+    "prebuild": "tsc",
     "build": "snowpack build",
     "watch": "snowpack build --watch"
   },
