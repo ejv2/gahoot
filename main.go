@@ -4,12 +4,14 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"math/rand"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/ethanv2/gahoot/config"
+	"github.com/ethanv2/gahoot/game"
 )
 
 // Core application paths
@@ -22,7 +24,8 @@ const (
 
 // Application lifetime state
 var (
-	Config config.Config
+	Config      config.Config
+	Coordinator game.GameCoordinator
 )
 
 // checkFrontend checks if the frontend directory
@@ -44,6 +47,10 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Seed random
+	// MUST be done before game coordinator
+	rand.Seed(time.Now().UnixMilli())
+
 	// Init configs
 	Config, err = config.New(PathConfig)
 	if err != nil {
@@ -52,6 +59,10 @@ func main() {
 		}
 		log.Fatal(err)
 	}
+
+	// Init game coordinator
+	Coordinator = game.NewCoordinator(Config.GameTimeout)
+	log.Println("Generated test game", Coordinator.CreateGame().PIN)
 
 	// Banner
 	log.Printf("Gahoot! v%d.%d.%d server starting...", MajorVersion, MinorVersion, PatchVersion)
@@ -77,6 +88,18 @@ func main() {
 
 	router.GET("/", handleRoot)
 	router.GET("/join", handleJoin)
+
+	play := router.Group("/play/")
+	{
+		play.GET("/game/:pin", handleGame)
+		play.GET("/host/:pin", handleHost)
+	}
+
+	api := router.Group("/api/")
+	{
+		api.GET("/play/:pin", handlePlayApi)
+		api.GET("/host/:pin", handleHostApi)
+	}
 
 	err = srv.ListenAndServe()
 	log.Panic(err) // NOTREACHED: unless fatal error

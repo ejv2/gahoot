@@ -9,6 +9,7 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/go-playground/validator"
 )
@@ -18,6 +19,8 @@ type Config struct {
 
 	ListenAddr string
 	ListenPort uint64
+
+	GameTimeout time.Duration
 }
 
 // FullAddr returns the full address for use in serving based on both

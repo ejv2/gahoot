@@ -1,12 +1,13 @@
 # Gahoot - Distributed, FOSS rewrite of Kahoot! in GO
 # Copyright 2022 - Ethan Marshall
 
-SRV_SRC = main.go front.go ver.go \
-	  config/conf.go config/parse.go
+SRV_SRC = main.go front.go play.go api.go ver.go \
+	  config/conf.go config/parse.go \
+	  game/game.go game/doc.go game/coordinator.go game/player.go game/action.go
 EXE     = gahoot
 
-TSC_SRC = frontend/src/index.ts
-TSC_OUT = frontend/static/js/index.js
+TSC_SRC = frontend/src/index.ts frontend/src/play.ts
+TSC_OUT = frontend/static/js/index.js frontend/static/js/play.js
 TSC_DEP = frontend/node_modules
 
 all: server frontend
