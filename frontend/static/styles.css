@@ -100,6 +100,18 @@ form.wizard-box {
 	flex-direction: column;
 }
 
+p.error {
+	color: #A3001B;
+	font-weight: bold;
+	margin: 4px !important;
+}
+
+input.error {
+	border: 4px solid #A3001B;
+	background-color: #3B0009;
+	color: #A3001B;
+}
+
 .wizard > footer {
 	justify-self: flex-end;
 }

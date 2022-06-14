@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		{{template "head.gohtml"}}
+
+		<title>Play - Gahoot!</title>
+
+		<script>
+			window.uid = {{.UID}};
+			window.pin = {{.Pin}};
+		</script>
+		<script type="module" src="/static/js/play.js"></script>
+	</head>
+
+	<body x-init="$store.game.init()" x-data="$store.game" class="full wizard">
+		<p x-text="points"></p>
+		<p x-show="!connected" style="color: var(--red);">NOT CONNECTED!</p>
+	</body>
+
+</html>

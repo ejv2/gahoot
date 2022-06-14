@@ -5,27 +5,20 @@
 	<head>
 		{{template "head.gohtml"}}
 
-		<title>Enter Game PIN - Gahoot!</title>
+		<title>Choose a nickname - Gahoot!</title>
 	</head>
 
 	<body class="full wizard">
 		<form class="wizard-box">
-			<input
-				{{if and .PinPresent (not .PinValid)}} class="error" {{end}}
-				{{if .Pin}}value="{{.Pin}}"{{end}}
-				type="tel" placeholder="Game PIN" name="pin" required></input>
+			<input type="number" name="pin" value="{{.Pin}}" hidden></input>
 
-
-			{{- if and .PinPresent (not .PinValid)}}
-			<p class="error">Invalid game PIN</p>
-			{{end}}
+			<input type="text" max=20 placeholder="Nickname" name="nick" required></input>
 			<input class="btn btn-dark" type="submit"></input>
 		</form>
 
 		<footer class="wizard-footer">
 			<p>Powered by <a href="https://github.com/ethanv2/gahoot">Gahoot</a></p>
 		</footer>
-
 	</body>
 
 </html>
