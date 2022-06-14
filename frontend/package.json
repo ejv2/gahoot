@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "tsc",
     "build": "snowpack build",
-    "watch": "snowpack build --watch"
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
