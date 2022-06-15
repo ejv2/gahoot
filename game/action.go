@@ -81,13 +81,14 @@ func (c ConnectPlayer) Perform(game *Game) {
 	id := int(p)
 	if err != nil {
 		bail("invalid player ID")
+		return
 	}
 
 	// Validate player object
 	if id > len(game.state.Players) || id <= 0 {
 		bail("invalid player identifier")
 		return
-	} else if game.state.Players[id].Connected {
+	} else if game.state.Players[id-1].Connected {
 		bail("given ID already connected")
 		return
 	}
