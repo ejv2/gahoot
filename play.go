@@ -23,7 +23,7 @@ func handleHost(c *gin.Context) {
 // frontend. At this stage, the provided UID is not validated - the websocket
 // will simply fail later if this is invalid/out of range.
 func handleGame(c *gin.Context) {
-	dat := struct{
+	dat := struct {
 		// NOTE: Must be uint32, as game.GamePin is formatted as a JS string
 		Pin uint32
 		UID int

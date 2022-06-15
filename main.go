@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"log"
-	"net/http"
 	"math/rand"
+	"net/http"
 	"os"
 	"time"
 
@@ -71,10 +71,11 @@ func main() {
 	// Startup and listen
 	router := gin.New()
 	srv := http.Server{
-		Addr:         Config.FullAddr(),
-		Handler:      router,
-		ReadTimeout:  500 * time.Millisecond,
-		WriteTimeout: 3 * time.Second,
+		Addr:              Config.FullAddr(),
+		Handler:           router,
+		ReadHeaderTimeout: 2 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      3 * time.Second,
 	}
 	router.Use(gin.Logger(), gin.Recovery())
 

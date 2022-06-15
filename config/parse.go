@@ -50,7 +50,7 @@ func parse(c *Config, path string) error {
 			c.ListenPort, err = strconv.ParseUint(trail, 10, 64)
 		case "game_timeout":
 			i, e := strconv.ParseInt(trail, 10, 32)
-			c.GameTimeout, err = time.Second * time.Duration(i), e
+			c.GameTimeout, err = time.Second*time.Duration(i), e
 		default:
 			err = fmt.Errorf("unknown key: %q", key)
 		}
