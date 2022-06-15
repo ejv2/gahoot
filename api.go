@@ -38,7 +38,7 @@ func handlePlayApi(c *gin.Context) {
 	if param == "" {
 		log.Panic("handlePlayApi: no PIN parameter in required handler")
 	}
-	pin, err := strconv.ParseInt(param, 10, 32)
+	pin, err := strconv.ParseUint(param, 10, 32)
 	if err != nil {
 		c.AbortWithStatus(400)
 		log.Println("API error:", err)
