@@ -1,9 +1,11 @@
 package game
 
 import (
-	"time"
+	"context"
+	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -25,10 +27,18 @@ type AddPlayer struct {
 }
 
 func (p AddPlayer) Perform(game *Game) {
+	end, ok := game.ctx.Deadline()
+	if !ok {
+		panic("addplayer: found game with no deadline")
+	}
+
+	child, cancel := context.WithDeadline(game.ctx, end)
 	game.state.Players = append(game.state.Players, Player{
 		Nick:      p.Nick,
 		Connected: false,
-		Ctx:       game.ctx,
+		Ctx: child,
+		Cancel: cancel,
+		Send: make(chan string),
 	})
 
 	p.ID <- len(game.state.Players)
@@ -47,6 +57,7 @@ type ConnectPlayer struct {
 
 func (c ConnectPlayer) Perform(game *Game) {
 	bail := func(why string) {
+		log.Println("websocket handshake error:", why)
 		c.Conn.WriteControl(websocket.CloseMessage,
 			websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, why),
 			time.Now().Add(time.Second))
@@ -54,7 +65,7 @@ func (c ConnectPlayer) Perform(game *Game) {
 	}
 
 	// Enforce 30s handshake deadline to stop deadlocking of the game thread
-	c.Conn.SetReadDeadline(time.Now().Add(time.Second*30))
+	c.Conn.SetReadDeadline(time.Now().Add(time.Second * 30))
 	defer c.Conn.SetReadDeadline(*new(time.Time))
 
 	t, b, err := c.Conn.ReadMessage()
