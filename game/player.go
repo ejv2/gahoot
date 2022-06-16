@@ -101,7 +101,7 @@ func (p Player) Run(ev chan GameAction) {
 
 readloop:
 	for {
-		t, r, err := p.conn.NextReader()
+		t, msg, err := p.conn.ReadMessage()
 		switch {
 		case err != nil:
 			p.conn.Close()
@@ -112,8 +112,6 @@ readloop:
 			bail("expected text messages, got binary")
 			return
 		}
-		msg := new(strings.Builder)
-		io.Copy(msg, r)
 		log.Println("got message from", p.conn.RemoteAddr().String(), ":", msg)
 
 		select {
