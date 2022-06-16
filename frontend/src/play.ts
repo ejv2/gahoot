@@ -8,7 +8,7 @@
 import Alpine from "alpinejs"
 
 // Gameplay constants
-export const PlayEndpoint = "ws://" + location.host + "/api/play/"
+const PlayEndpoint = "ws://" + location.host + "/api/play/"
 
 // Page lifetime variables
 let conn: WebSocket
