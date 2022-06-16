@@ -55,7 +55,7 @@ class PlayerState {
     //
     // NOTE: Does not do any interaction with events!
     // All event handlers must be hooked in init()
-    constructor() {
+    constructor(game: number, user: number) {
         this.connected = false
         this.points = this.rank = 0
 
@@ -73,16 +73,23 @@ class PlayerState {
     // Data should not be mutated in here, unless the mutation is *really* simple
     // Delegate to methods where appropriate
     init() {
-        conn.onopen = () => {this.handleConnection(true)}
-        conn.onclose = () => {this.handleConnection(false)}
+        conn.onopen = () => {this.initConn()}
+        conn.onclose = (ev: CloseEvent) => {this.handleConnection(false);console.log(ev)}
         conn.onmessage = (e: MessageEvent) => {this.handleMsg(e)}
         conn.onerror = () => {this.handleConnection(false)}
+    }
+
+    // Initializes the connection and internal state by sending the ident
+    // packets
+    initConn() {
+        sendMessage(conn, "ident", this.uid)
+        console.log("authenticated to game " + this.pin.toString())
+        this.handleConnection(true)
     }
 
     // handleConnection is called when a websocket connection changes state
     handleConnection(conn: boolean) {
         this.connected = conn
-        // TODO: Add more handling here
     }
 
     // handleMsg is called when a websocket message arrives
@@ -100,13 +107,17 @@ class PlayerState {
     }
 }
 
+function sendMessage(ws: WebSocket, action: string, body: any) {
+    ws.send(action + " " + body.toString())
+}
+
 // Main frontend init code
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Gahoot! client scripts loaded")
     console.log("Joining game " + window.pin + " as " + window.uid)
 
     // Init our global objects
-    plr = new PlayerState()
+    plr = new PlayerState(window.pin, window.uid)
 
     // Load information
     let url = PlayEndpoint + window.pin.toString()
