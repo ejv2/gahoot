@@ -82,8 +82,9 @@ func main() {
 	router.LoadHTMLGlob("frontend/templates/*")
 	router.Static("/static/", PathStatic)
 
-	// Source files for JS debugging
+	// Debugging specific router settings
 	if gin.IsDebugging() {
+		// Serve source files for debugging
 		router.Static("/src/", "frontend/src/")
 	}
 
