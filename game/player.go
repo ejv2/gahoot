@@ -90,7 +90,12 @@ func (p Player) Run(ev chan GameAction) {
 	pongInterval, pongTimeout := time.Second*15, time.Second*4
 	p.conn.SetReadDeadline(lastPong.Add(pongInterval).Add(pongTimeout))
 	p.conn.SetPongHandler(func(appData string) error {
-		log.Println("got pong response with latency", time.Now().Add(-pongInterval).Sub(lastPong), "from", p.conn.RemoteAddr())
+		latency := time.Now().Add(-pongInterval).Sub(lastPong)
+		if latency < 0 {
+			latency = 0 - latency
+		}
+
+		log.Println("got pong response with latency", latency, "from", p.conn.RemoteAddr())
 		lastPong = time.Now()
 		p.conn.SetReadDeadline(lastPong.Add(pongInterval).Add(pongTimeout))
 		return nil
