@@ -30,6 +30,11 @@ const (
 	MinPlayers  = 3
 )
 
+// stateFunc is a current state in the finite state machine of the game state.
+// It returns a new stateFunc that will replace it after it returns and could
+// simply be itself
+type stateFunc func() stateFunc
+
 // GameState is the current state of an ongoing, running game instance. This is
 // separated into a separate struct for ease of passing around combined game
 // state to other objects, as well as to separate methods which act on the game
@@ -80,7 +85,11 @@ func (game *Game) Run() {
 		game.reaper <- game.PIN
 	}()
 
-	for {
+	// Loop until our statefunc tells us that we are dead (nil state).
+	//
+	// We begin in the WaitForHost state, as the host will still be waiting
+	// on our connection, after which we wait for players.
+	for game.sf = game.WaitForHost; game.sf != nil; game.sf = game.sf() {
 		select {
 		case <-game.ctx.Done():
 			return
@@ -90,4 +99,23 @@ func (game *Game) Run() {
 			req <- game.state
 		}
 	}
+}
+
+func (game *Game) WaitForHost() stateFunc {
+	game.state.Status = GameHostWaiting
+	return game.WaitForHost
+}
+
+func (game *Game) WaitForPlayers() stateFunc {
+	if len(game.state.Players) >= MinPlayers {
+		return game.GameStarting
+	} else {
+		game.state.Status = GameWaiting
+		return game.WaitForPlayers
+	}
+}
+
+func (game *Game) GameStarting() stateFunc {
+	game.state.Status = GameRunning
+	return nil
 }
