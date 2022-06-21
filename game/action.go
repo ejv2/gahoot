@@ -33,11 +33,13 @@ func (p AddPlayer) Perform(game *Game) {
 
 	child, cancel := context.WithDeadline(game.ctx, end)
 	game.state.Players = append(game.state.Players, Player{
+		ID: len(game.state.Players)+1,
 		Nick:      p.Nick,
 		Connected: false,
 		Ctx: child,
 		Cancel: cancel,
 		Send: make(chan string),
+		update: game.Action,
 	})
 
 	p.ID <- len(game.state.Players)
@@ -109,4 +111,19 @@ func (c ConnectPlayer) Perform(game *Game) {
 
 	// Launch player runner
 	go game.state.Players[id-1].Run(game.Action)
+}
+
+// ConnectionUpdate submits a new connection state to the game loop.
+//
+// Used to inform the game loop of a disconnection or re-connection, if
+// appropriate. This does not remove the player from the player roster, but
+// does make it possible for the player to re-connect and resume.
+type ConnectionUpdate struct {
+	PlayerID  int
+	Connected bool
+}
+
+func (c ConnectionUpdate) Perform(game *Game) {
+	// PlayerID is the human-readable ID, so subtract one
+	game.state.Players[c.PlayerID-1].Connected = c.Connected
 }

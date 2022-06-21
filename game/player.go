@@ -41,6 +41,7 @@ const (
 // handles ping timeouts. These must never be used, except by the player runner
 // thread.
 type Player struct {
+	ID      int
 	Nick    string
 	Score   int64
 	Correct int
@@ -50,6 +51,7 @@ type Player struct {
 	Cancel    context.CancelFunc
 
 	Send chan string
+	update chan<- GameAction
 	conn *websocket.Conn
 }
 
@@ -73,6 +75,13 @@ func (p Player) writer(interval time.Duration) {
 			return
 
 		}
+	}
+}
+
+func (p Player) updateConnected(connected bool) {
+	select {
+	case p.update <- ConnectionUpdate{p.ID, connected}:
+	case <-p.Ctx.Done():
 	}
 }
 
@@ -103,7 +112,11 @@ func (p Player) Run(ev chan GameAction) {
 	})
 
 	go p.writer(pongInterval)
-	defer p.Cancel()
+	defer func() {
+		p.Cancel()
+		p.updateConnected(false)
+		log.Printf("%s (nick: %q) disconnected", p.conn.RemoteAddr(), p.Nick)
+	}()
 
 readloop:
 	for {
