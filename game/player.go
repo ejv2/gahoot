@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"time"
+	"encoding/json"
 
 	"github.com/gorilla/websocket"
 )
@@ -133,4 +134,15 @@ readloop:
 		websocket.FormatCloseMessage(websocket.CloseNormalClosure, "game over"),
 		time.Now().Add(time.Second*10))
 	p.conn.Close()
+}
+
+func FormatMessage(command string, data interface{}) string {
+	var payload []byte
+	if data == nil {
+		payload = []byte{}
+	} else {
+		payload, _ = json.Marshal(data)
+	}
+
+	return command + " " + string(payload)
 }
