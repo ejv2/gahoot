@@ -24,7 +24,8 @@ type GameStatus int
 
 // Gameplay constants
 const (
-	MaximumGameTime = time.Minute * 45
+	MaxGameTime = time.Minute * 45
+	MinPlayers  = 3
 )
 
 // GameState is the current state of an ongoing, running game instance. This is
@@ -46,12 +47,15 @@ type Game struct {
 	reaper chan GamePin
 	ctx    context.Context
 	cancel context.CancelFunc
+	quiz quiz.Quiz
 	state  GameState
+	sf     stateFunc
+
 }
 
 func NewGame(pin GamePin, reaper chan GamePin, maxGameTime time.Duration) Game {
 	if maxGameTime == 0 {
-		maxGameTime = MaximumGameTime
+		maxGameTime = MaxGameTime
 	}
 
 	c, cancel := context.WithTimeout(context.Background(), maxGameTime)

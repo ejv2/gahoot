@@ -14,7 +14,6 @@ import (
 // are variadic and separated by whitespace. The "<verb>" can be any of these
 // constants.
 const (
-	CommandGameOver     = "end"
 	CommandQuestionOver = "qend"
 	CommandNewQuestion  = "ques"
 	CommandNewOptions   = "opts"
@@ -56,6 +55,8 @@ type Player struct {
 }
 
 func (p Player) writer(interval time.Duration) {
+	tick := time.NewTicker(interval)
+	defer tick.Stop()
 	for {
 		select {
 		case msg := <-p.Send:
@@ -64,7 +65,7 @@ func (p Player) writer(interval time.Duration) {
 				p.Cancel()
 				return
 			}
-		case <-time.After(interval):
+		case <-tick.C:
 			log.Println("sending ping message to", p.conn.RemoteAddr())
 			err := p.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(interval))
 			if err != nil {
@@ -113,8 +114,8 @@ func (p Player) Run(ev chan GameAction) {
 
 	go p.writer(pongInterval)
 	defer func() {
-		p.Cancel()
 		p.updateConnected(false)
+		p.Cancel()
 		log.Printf("%s (nick: %q) disconnected", p.conn.RemoteAddr(), p.Nick)
 	}()
 
@@ -127,7 +128,9 @@ readloop:
 			return
 		case t == websocket.PingMessage || t == websocket.PongMessage:
 			continue readloop
-		case t != websocket.TextMessage:
+		case t == websocket.CloseMessage:
+			return
+		case t == websocket.BinaryMessage:
 			bail("expected text messages, got binary")
 			return
 		}
@@ -142,7 +145,6 @@ readloop:
 
 	// If we got here, the game is done and the player instance is exiting
 	// Send the final goodbyes
-	p.Send <- CommandGameOver
 	p.conn.WriteControl(websocket.CloseMessage,
 		websocket.FormatCloseMessage(websocket.CloseNormalClosure, "game over"),
 		time.Now().Add(time.Second*10))

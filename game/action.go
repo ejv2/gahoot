@@ -26,20 +26,15 @@ type AddPlayer struct {
 }
 
 func (p AddPlayer) Perform(game *Game) {
-	end, ok := game.ctx.Deadline()
-	if !ok {
-		panic("addplayer: found game with no deadline")
-	}
-
-	child, cancel := context.WithDeadline(game.ctx, end)
+	// NOTE: Deliberately does not start the player context.
+	// Runner has not yet started and the context must be re-created on
+	// re-connection
 	game.state.Players = append(game.state.Players, Player{
-		ID: len(game.state.Players)+1,
+		ID:        len(game.state.Players) + 1,
 		Nick:      p.Nick,
 		Connected: false,
-		Ctx: child,
-		Cancel: cancel,
-		Send: make(chan string),
-		update: game.Action,
+		Send:      make(chan string),
+		update:    game.Action,
 	})
 
 	p.ID <- len(game.state.Players)
@@ -108,6 +103,14 @@ func (c ConnectPlayer) Perform(game *Game) {
 	// Go ahead and update player object
 	game.state.Players[id-1].Connected = true
 	game.state.Players[id-1].conn = c.Conn
+
+	// Add context for player
+	end, ok := game.ctx.Deadline()
+	if !ok {
+		panic("addplayer: found game with no deadline")
+	}
+	game.state.Players[id-1].Ctx,
+		game.state.Players[id-1].Cancel = context.WithDeadline(game.ctx, end)
 
 	// Launch player runner
 	go game.state.Players[id-1].Run(game.Action)
