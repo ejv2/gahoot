@@ -89,8 +89,9 @@ func (c *GameCoordinator) CreateGame() Game {
 	c.games[g.PIN] = g
 	c.mut.Unlock()
 
+	// NOTE: Must return copy from map here, or subtle data race caused
 	go g.Run()
-	return g
+	return c.games[g.PIN]
 }
 
 // GetGame does a thread safe lookup in the game map for the specified PIN.
