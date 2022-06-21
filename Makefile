@@ -3,7 +3,8 @@
 
 SRV_SRC = main.go front.go play.go api.go ver.go \
 	  config/conf.go config/parse.go \
-	  game/game.go game/doc.go game/coordinator.go game/player.go game/action.go
+	  game/game.go game/doc.go game/coordinator.go game/player.go game/action.go \
+	  game/quiz/quiz.go
 EXE     = gahoot
 
 TSC_SRC = frontend/src/index.ts frontend/src/play.ts
@@ -15,6 +16,9 @@ all: server frontend
 server: ${EXE}
 
 frontend: ${TSC_OUT}
+
+test:
+	go test ./...
 
 ${EXE}: ${SRV_SRC}
 	go build .
@@ -37,4 +41,4 @@ clean:
 	rm -rf frontend/static/js/
 	rm -rf frontend/.genjs/
 
-.PHONY: clean watch frontend server
+.PHONY: clean test watch frontend server
