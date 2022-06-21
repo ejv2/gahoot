@@ -2,7 +2,6 @@ package game
 
 import (
 	"context"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -57,7 +56,6 @@ type ConnectPlayer struct {
 
 func (c ConnectPlayer) Perform(game *Game) {
 	bail := func(why string) {
-		log.Println("websocket handshake error:", why)
 		c.Conn.WriteControl(websocket.CloseMessage,
 			websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, why),
 			time.Now().Add(time.Second*10))
