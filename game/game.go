@@ -3,6 +3,8 @@ package game
 import (
 	"context"
 	"time"
+
+	"github.com/ethanv2/gahoot/game/quiz"
 )
 
 // Possible game states
@@ -39,7 +41,8 @@ type GameState struct {
 
 // Game is a single instance of a running game
 type Game struct {
-	PIN GamePin
+	PIN  GamePin
+	quiz.Quiz
 
 	Action  chan GameAction
 	Request chan chan GameState
@@ -47,10 +50,8 @@ type Game struct {
 	reaper chan GamePin
 	ctx    context.Context
 	cancel context.CancelFunc
-	quiz quiz.Quiz
 	state  GameState
 	sf     stateFunc
-
 }
 
 func NewGame(pin GamePin, reaper chan GamePin, maxGameTime time.Duration) Game {
