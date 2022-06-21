@@ -18,7 +18,27 @@ var (
 	ErrArray      = errors.New("config: array unclosed")
 )
 
-func parseArray(s *bufio.Scanner, l *int) ([]string, error) {
+func parseArray(s *bufio.Scanner, l *int, trail string) ([]string, error) {
+	var ret []string
+	var err error
+
+	switch trail {
+	case "[":
+		ret, err = parseArrayBody(s, l)
+	case "]":
+		err = errors.New("invalid array syntax")
+	case "[]":
+		ret = nil
+
+	default:
+		ret = make([]string, 1)
+		ret[0] = trail
+	}
+
+	return ret, err
+}
+
+func parseArrayBody(s *bufio.Scanner, l *int) ([]string, error) {
 	ret := make([]string, 0, 2)
 
 scanloop:
@@ -79,18 +99,7 @@ func parse(c *Config, path string) error {
 		case "port":
 			c.ListenPort, err = strconv.ParseUint(trail, 10, 64)
 		case "proxies":
-			switch trail {
-			case "[":
-				c.TrustedProxies, err = parseArray(s, &num)
-			case "]":
-				err = errors.New("invalid array syntax")
-			case "[]":
-				c.TrustedProxies = nil
-
-			default:
-				c.TrustedProxies = make([]string, 1)
-				c.TrustedProxies[0] = trail
-			}
+			c.TrustedProxies, err = parseArray(s, &num, trail)
 		case "game_timeout":
 			i, e := strconv.ParseInt(trail, 10, 32)
 			c.GameTimeout, err = time.Second*time.Duration(i), e
