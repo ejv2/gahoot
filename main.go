@@ -91,6 +91,14 @@ func main() {
 	router.GET("/", handleRoot)
 	router.GET("/join", handleJoin)
 
+	create := router.Group("/create/")
+	{
+		create.GET("/", handleCreate)
+		create.GET("/find", handleFind)
+		create.GET("/upload", handleUpload)
+		create.GET("/new", handleEditor)
+	}
+
 	play := router.Group("/play/")
 	{
 		play.GET("/game/:pin", handleGame)

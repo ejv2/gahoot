@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		{{template "head.gohtml"}}
+		{{template "title" "Start a game"}}
+	</head>
+
+	<body class="full wizard">
+		<div class="wizard-box wizard-box-vertical wizard-box-options">
+			<div class="wizard-option">
+				<span class="wizard-option-num">1</span>
+				<div class="wizard-option-text">
+					<a href="/create/find">Find a game on this server</a>
+					<small>Find already uploaded games on this server</small>
+				</div>
+				<a href="/create/find" class="wizard-option-icon">❯</a>
+			</div>
+
+			<div class="wizard-option">
+				<span class="wizard-option-num">2</span>
+				<div class="wizard-option-text">
+					<a href="/create/upload">Upload a game file</a>
+					<small>Upload any game and play on this server</small>
+				</div>
+				<a href="/create/upload" class="wizard-option-icon">❯</a>
+			</div>
+
+			<div class="wizard-option">
+				<span class="wizard-option-num">3</span>
+				<div class="wizard-option-text">
+					<a href="/create/new">Create your own game</a>
+					<small>Create, download and play a quiz in the online editor</small>
+				</div>
+				<a href="/create/new" class="wizard-option-icon">❯</a>
+			</div>
+		</div>
+	</body>
+
+</html>

@@ -91,12 +91,18 @@ input[type=submit] {
 
 .wizard-box {
 	display: flex;
+	padding: 3px;
 	background-color: white;
 	color: #000;
 	border-radius: 4px;
 }
 
-form.wizard-box {
+.wizard-box-options {
+	align-content: center;
+	min-width: 75vw;
+}
+
+form.wizard-box, .wizard-box-vertical {
 	flex-direction: column;
 }
 
@@ -114,4 +120,55 @@ input.error {
 
 .wizard > footer {
 	justify-self: flex-end;
+}
+
+.wizard-option {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 50px;
+	margin-top: 5px;
+	text-align: center;
+}
+
+.wizard-option:not(:nth-last-of-type(1)) {
+	border-bottom: 2px solid #ccc;
+}
+
+.wizard-option-num {
+	min-height: 25px;
+	min-width: 25px;
+	margin-left: 10px;
+	color: var(--blue);
+	border: 3px solid #555;
+	border-radius: 50%;
+	text-align: center;
+}
+
+.wizard-option-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.wizard-option-text > a {
+	color: var(--blue) !important;
+	font-weight: bold;
+	text-decoration: underline;
+	margin-bottom: 0px;
+}
+
+.wizard-option-text > small {
+	margin: 0;
+	margin-bottom: 3px;
+	color: #444;
+}
+
+.wizard-option-icon {
+	color: #1368CE;
+	justify-self: flex-end;
+	margin: 5px;
+	min-width: 25px;
+	min-height: 25px;
+	text-align: center;
+	cursor: pointer;
 }

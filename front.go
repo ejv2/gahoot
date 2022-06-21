@@ -79,3 +79,19 @@ func handleJoin(c *gin.Context) {
 
 	joinPin()
 }
+
+func handleCreate(c *gin.Context) {
+	c.HTML(200, "create.gohtml", nil)
+}
+
+func handleFind(c *gin.Context) {
+	c.String(200, "Work in progress")
+}
+
+func handleUpload(c *gin.Context) {
+	c.String(200, "Coming soon!")
+}
+
+func handleEditor(c *gin.Context) {
+	c.Redirect(http.StatusTemporaryRedirect, "/")
+}
