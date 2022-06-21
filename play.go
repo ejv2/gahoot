@@ -36,7 +36,7 @@ func handleGame(c *gin.Context) {
 	}
 
 	back := func() {
-		c.Redirect(http.StatusTemporaryRedirect, "/join?pin="+id)
+		c.Redirect(http.StatusSeeOther, "/join?pin="+id)
 		c.Abort()
 	}
 

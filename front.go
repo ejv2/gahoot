@@ -27,7 +27,6 @@ func handleJoin(c *gin.Context) {
 		PinValid   bool
 		PinPresent bool
 	}{}
-
 	// Aliases for landing pages.
 	joinPin := func() {
 		c.HTML(200, "join.gohtml", dat)
@@ -69,7 +68,7 @@ func handleJoin(c *gin.Context) {
 			g.Action <- act
 			id := int64(<-act.ID)
 
-			c.Redirect(http.StatusTemporaryRedirect,
+			c.Redirect(http.StatusSeeOther,
 				"/play/game/"+p+"?plr="+strconv.FormatInt(id, 10))
 			return
 		}
