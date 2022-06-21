@@ -3,12 +3,26 @@
 // Keys are formed by placing the config key before a colon and the
 // desired value after. Eg:
 //	key: "value pair"
+//
 // Lines beginning with "//" or which are blank are discarded
+//
+// Some options accept multiple options as an array. To write this,
+// place options between square braces on new lines. Eg:
+//	key: [
+//		value1
+//		value2
+//	]
+// If only one option is wished, it can be passed as normal. Eg:
+//	key: value1
+// Blank lines are not permitted between array braces. The first brace
+// must be on the same line as the key and the last on a newline.
+//
 // Not all options are required. They can be omitted or left blank.
 
 // Network settings
 addr: 0.0.0.0
 port: 8080
+proxies: []
 
 // Gameplay settings
 game_timeout: 2700

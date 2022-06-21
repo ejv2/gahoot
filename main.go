@@ -78,7 +78,7 @@ func main() {
 		WriteTimeout:      5 * time.Second,
 	}
 	router.Use(gin.Logger(), gin.Recovery())
-	router.SetTrustedProxies(nil)
+	router.SetTrustedProxies(Config.TrustedProxies)
 
 	router.LoadHTMLGlob("frontend/templates/*")
 	router.Static("/static/", PathStatic)

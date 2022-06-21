@@ -17,8 +17,9 @@ import (
 type Config struct {
 	validator *validator.Validate
 
-	ListenAddr string
-	ListenPort uint64
+	ListenAddr     string
+	ListenPort     uint64
+	TrustedProxies []string
 
 	GameTimeout time.Duration
 }

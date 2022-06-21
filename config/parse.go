@@ -15,7 +15,37 @@ var (
 	ErrInvalidKey = errors.New("config: invalid key")
 	ErrUnknownKey = errors.New("config: unknown key")
 	ErrParse      = errors.New("config: parse error")
+	ErrArray      = errors.New("config: array unclosed")
 )
+
+func parseArray(s *bufio.Scanner, l *int) ([]string, error) {
+	ret := make([]string, 0, 2)
+
+scanloop:
+	for s.Scan() {
+		*l++
+
+		str := s.Text()
+		switch str {
+		case "[":
+			continue scanloop
+		case "]":
+			break scanloop
+		case "":
+			return ret, errors.New("unclosed array braces")
+		}
+
+		ret = append(ret, strings.TrimSpace(str))
+	}
+	if s.Err() != nil {
+		return nil, s.Err()
+	}
+
+	if len(ret) == 0 {
+		ret = nil
+	}
+	return ret, nil
+}
 
 // parse advances through the config file, extracting one config key per line.
 // Keys are separated from content by a single ':' (colon). Any UTF-8 text can
@@ -30,10 +60,10 @@ func parse(c *Config, path string) error {
 	s.Split(bufio.ScanLines)
 	for num := 1; s.Scan(); num++ {
 		l := s.Text()
-		s := strings.SplitN(l, ":", 2)
+		str := strings.SplitN(l, ":", 2)
 
 		// Probably blank line
-		if len(s) != 2 {
+		if len(str) != 2 {
 			continue
 		}
 		// Comment; ignore
@@ -42,12 +72,25 @@ func parse(c *Config, path string) error {
 		}
 
 		var err error
-		key, trail := strings.ToLower(s[0]), strings.Trim(s[1], " \t")
+		key, trail := strings.ToLower(str[0]), strings.TrimSpace(str[1])
 		switch key {
 		case "addr":
 			c.ListenAddr = trail
 		case "port":
 			c.ListenPort, err = strconv.ParseUint(trail, 10, 64)
+		case "proxies":
+			switch trail {
+			case "[":
+				c.TrustedProxies, err = parseArray(s, &num)
+			case "]":
+				err = errors.New("invalid array syntax")
+			case "[]":
+				c.TrustedProxies = nil
+
+			default:
+				c.TrustedProxies = make([]string, 1)
+				c.TrustedProxies[0] = trail
+			}
 		case "game_timeout":
 			i, e := strconv.ParseInt(trail, 10, 32)
 			c.GameTimeout, err = time.Second*time.Duration(i), e
