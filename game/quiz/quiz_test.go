@@ -30,10 +30,10 @@ func TestLoadQuiz(t *testing.T) {
 		{"{}", true, ""},
 		// Length testing
 		{generateLong(quiz.MaxQuizSize), true, ""},
-		{generateLong(quiz.MaxQuizSize+1), false, "too large"},
-		{generateLong(quiz.MaxQuizSize*2), false, "too large"},
-		{generateLong(quiz.MaxQuizSize-1), true, ""},
-		{generateLong(quiz.MaxQuizSize/2), true, ""},
+		{generateLong(quiz.MaxQuizSize + 1), false, "too large"},
+		{generateLong(quiz.MaxQuizSize * 2), false, "too large"},
+		{generateLong(quiz.MaxQuizSize - 1), true, ""},
+		{generateLong(quiz.MaxQuizSize / 2), true, ""},
 	}
 
 	for _, elem := range tests {

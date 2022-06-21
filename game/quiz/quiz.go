@@ -1,9 +1,9 @@
 package quiz
 
 import (
-	"encoding/json"
-	"crypto/sha256"
 	"bytes"
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"hash"
 	"io"

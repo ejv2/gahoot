@@ -46,7 +46,7 @@ type GameState struct {
 
 // Game is a single instance of a running game
 type Game struct {
-	PIN  GamePin
+	PIN GamePin
 	quiz.Quiz
 
 	Action  chan GameAction

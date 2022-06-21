@@ -2,9 +2,9 @@ package game
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"time"
-	"encoding/json"
 
 	"github.com/gorilla/websocket"
 )
@@ -49,9 +49,9 @@ type Player struct {
 	Ctx       context.Context
 	Cancel    context.CancelFunc
 
-	Send chan string
+	Send   chan string
 	update chan<- GameAction
-	conn *websocket.Conn
+	conn   *websocket.Conn
 }
 
 func (p Player) writer(interval time.Duration) {
@@ -74,7 +74,6 @@ func (p Player) writer(interval time.Duration) {
 			}
 		case <-p.Ctx.Done():
 			return
-
 		}
 	}
 }
@@ -151,6 +150,8 @@ readloop:
 	p.conn.Close()
 }
 
+// FormatMessage returns the client-readable form of the message consisting of
+// the verb "command" and arguments from data in JSON form
 func FormatMessage(command string, data interface{}) string {
 	var payload []byte
 	if data == nil {
