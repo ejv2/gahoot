@@ -87,7 +87,7 @@ func (p Player) Run(ev chan GameAction) {
 	}
 
 	lastPong := time.Now()
-	pongInterval, pongTimeout := time.Second*15, time.Second*4
+	pongInterval, pongTimeout := time.Second*15, time.Second*10
 	p.conn.SetReadDeadline(lastPong.Add(pongInterval).Add(pongTimeout))
 	p.conn.SetPongHandler(func(appData string) error {
 		latency := time.Now().Add(-pongInterval).Sub(lastPong)

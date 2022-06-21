@@ -73,9 +73,9 @@ func main() {
 	srv := http.Server{
 		Addr:              Config.FullAddr(),
 		Handler:           router,
-		ReadHeaderTimeout: 2 * time.Second,
-		ReadTimeout:       10 * time.Second,
-		WriteTimeout:      3 * time.Second,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      5 * time.Second,
 	}
 	router.Use(gin.Logger(), gin.Recovery())
 

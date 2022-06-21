@@ -60,7 +60,7 @@ func (c ConnectPlayer) Perform(game *Game) {
 		log.Println("websocket handshake error:", why)
 		c.Conn.WriteControl(websocket.CloseMessage,
 			websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, why),
-			time.Now().Add(time.Second))
+			time.Now().Add(time.Second*10))
 		c.Conn.Close()
 	}
 
