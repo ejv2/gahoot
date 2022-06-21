@@ -18,7 +18,7 @@ var (
 	}
 )
 
-// handlePlayApi is the handler for "/api/play/{PIN}"
+// handlePlayAPI is the handler for "/api/play/{PIN}"
 //
 // Accepts an incoming request to play a game for a specific game PIN and
 // fabricates a new user from the provided data before handing off control over
@@ -33,7 +33,7 @@ var (
 // Additionally, this call will not block if still waiting on the host. The client
 // will be connected and initialised, but will be instructed to simply do nothing
 // until the host is available.
-func handlePlayApi(c *gin.Context) {
+func handlePlayAPI(c *gin.Context) {
 	param := c.Param("pin")
 	if param == "" {
 		log.Panic("handlePlayApi: no PIN parameter in required handler")
@@ -78,7 +78,7 @@ func handlePlayApi(c *gin.Context) {
 // This websocket lasts the lifetime of a game. If the client disconnects for any
 // reason (missed hearbeats or manual disconnect), the game will be immediately
 // cancelled.
-func handleHostApi(c *gin.Context) {
+func handleHostAPI(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("host api failure:", err)

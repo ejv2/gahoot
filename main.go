@@ -108,8 +108,8 @@ func main() {
 
 	api := router.Group("/api/")
 	{
-		api.GET("/play/:pin", handlePlayApi)
-		api.GET("/host/:pin", handleHostApi)
+		api.GET("/play/:pin", handlePlayAPI)
+		api.GET("/host/:pin", handleHostAPI)
 	}
 
 	err = srv.ListenAndServe()
