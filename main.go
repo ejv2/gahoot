@@ -78,9 +78,13 @@ func main() {
 		WriteTimeout:      5 * time.Second,
 	}
 	router.Use(gin.Logger(), gin.Recovery())
-	router.SetTrustedProxies(Config.TrustedProxies)
 
-	router.LoadHTMLGlob("frontend/templates/*")
+	// Load user-specified proxy config
+	if err := router.SetTrustedProxies(Config.TrustedProxies); err != nil {
+		log.Fatal("invalid proxy entries:", err)
+	}
+
+	router.LoadHTMLGlob(PathTemplates + "/*")
 	router.Static("/static/", PathStatic)
 
 	// Debugging specific router settings

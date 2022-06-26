@@ -57,6 +57,10 @@ func handleGame(c *gin.Context) {
 	}
 	p, err := strconv.ParseUint(uid, 10, 32)
 	intuid = int(p)
+	if err != nil {
+		back()
+		return
+	}
 
 	dat.Pin, dat.UID = uint32(i), intuid
 	log.Println("user ID", intuid, "is joining game", pin)
