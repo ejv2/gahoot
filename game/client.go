@@ -149,7 +149,6 @@ func (c Client) Read(buf []byte) (int, error) {
 		bail("expected text messages, got binary")
 		return 0, ErrorBadMessageType
 	}
-	log.Println("got message from", c.conn.RemoteAddr().String(), ":", string(msg))
 
 	max := len(buf)
 	if max > len(msg) {

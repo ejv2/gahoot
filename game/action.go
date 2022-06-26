@@ -2,8 +2,7 @@ package game
 
 import (
 	"context"
-	"strconv"
-	"strings"
+	"log"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -53,50 +52,42 @@ type ConnectPlayer struct {
 }
 
 func (c ConnectPlayer) Perform(game *Game) {
-	bail := func(why string) {
-		c.Conn.WriteControl(websocket.CloseMessage,
-			websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, why),
-			time.Now().Add(time.Second*10))
-		c.Conn.Close()
-	}
-
 	// Enforce 30s handshake deadline to stop deadlocking of the game thread
 	c.Conn.SetReadDeadline(time.Now().Add(time.Second * 30))
 	defer c.Conn.SetReadDeadline(*new(time.Time))
 
-	t, b, err := c.Conn.ReadMessage()
-	switch {
-	case t != websocket.TextMessage:
-		bail("expected text messages, got binary")
-		return
-	case err != nil:
-		c.Conn.Close()
+	// Temporary client object.
+	//
+	// We set Ctx to background (and implicitly Cancel to nil) here, as we
+	// are not planning on calling Open, so the PING system doesn't need to
+	// start.
+	//
+	// DO NOT call cl.Init() and DO NOT call cl.Close{,Reason} unless there
+	// was a fatal error.
+	cl := Client{
+		Connected: true,
+		conn:      c.Conn,
+		Send:      nil,
+		Ctx:       context.Background(),
+	}
+	var id int32
+	verb, err := cl.ReadMessage(&id)
+	if err != nil {
+		cl.CloseReason(err.Error())
 		return
 	}
 
-	msg := string(b)
-	fields := strings.SplitN(msg, " ", 2)
-	if len(fields) != 2 {
-		bail("expected two fields per message")
-		return
-	}
-	if fields[0] != "ident" {
-		bail("expected first message to be IDENT")
-		return
-	}
-	p, err := strconv.ParseUint(fields[1], 10, 32)
-	id := int(p)
-	if err != nil {
-		bail("invalid player ID")
+	if verb != "ident" {
+		cl.CloseReason("expected first message to be IDENT")
 		return
 	}
 
 	// Validate player object
-	if id > len(game.state.Players) || id <= 0 {
-		bail("invalid player identifier")
+	if id > int32(len(game.state.Players)) || id <= 0 {
+		cl.CloseReason("invalid player identifier")
 		return
 	} else if game.state.Players[id-1].Connected {
-		bail("given ID already connected")
+		cl.CloseReason("given ID already connected")
 		return
 	}
 
@@ -112,6 +103,8 @@ func (c ConnectPlayer) Perform(game *Game) {
 	}
 	game.state.Players[id-1].Ctx,
 		game.state.Players[id-1].Cancel = context.WithDeadline(game.ctx, end)
+
+	log.Printf("%s (ID: %d) successfully joined %d", game.state.Players[id-1].Nick, id, game.PIN)
 
 	// Launch player runner
 	go game.state.Players[id-1].Run(game.Action)
