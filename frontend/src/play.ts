@@ -88,8 +88,8 @@ class PlayerState {
     }
 
     // handleConnection is called when a websocket connection changes state
-    handleConnection(conn: boolean) {
-        this.connected = conn
+    handleConnection(connected: boolean) {
+        this.connected = connected
     }
 
     // handleMsg is called when a websocket message arrives
