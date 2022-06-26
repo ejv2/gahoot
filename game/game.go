@@ -110,10 +110,10 @@ func (game *Game) WaitForHost() stateFunc {
 func (game *Game) WaitForPlayers() stateFunc {
 	if len(game.state.Players) >= MinPlayers {
 		return game.GameStarting
-	} else {
-		game.state.Status = GameWaiting
-		return game.WaitForPlayers
 	}
+
+	game.state.Status = GameWaiting
+	return game.WaitForPlayers
 }
 
 func (game *Game) GameStarting() stateFunc {
