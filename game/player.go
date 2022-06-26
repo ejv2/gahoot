@@ -1,32 +1,7 @@
 package game
 
 import (
-	"context"
-	"encoding/json"
 	"log"
-	"time"
-
-	"github.com/gorilla/websocket"
-)
-
-// WebSocket server message commands.
-// Each websocket message is formatted as "<verb> <arg0>...<arg n>", where args
-// are variadic and separated by whitespace. The "<verb>" can be any of these
-// constants.
-const (
-	CommandQuestionOver = "qend"
-	CommandNewQuestion  = "ques"
-	CommandNewOptions   = "opts"
-	CommandSeeResults   = "res"
-)
-
-// WebSocket client message commands.
-// Client equivalent of server message commands. See documentation for server
-// message commands for more details on format.
-const (
-	MessageAcknowledge = "ack"
-	MessageIdenfity    = "ident"
-	MessageAnswer      = "ans"
 )
 
 // A Player is one registered player as part of a running game. Each player is
@@ -40,100 +15,42 @@ const (
 // handles ping timeouts. These must never be used, except by the player runner
 // thread.
 type Player struct {
+	Client
+
 	ID      int
 	Nick    string
 	Score   int64
 	Correct int
-
-	Connected bool
-	Ctx       context.Context
-	Cancel    context.CancelFunc
-
-	Send   chan string
-	update chan<- GameAction
-	conn   *websocket.Conn
-}
-
-func (p Player) writer(interval time.Duration) {
-	tick := time.NewTicker(interval)
-	defer tick.Stop()
-	for {
-		select {
-		case msg := <-p.Send:
-			err := p.conn.WriteMessage(websocket.TextMessage, []byte(msg))
-			if err != nil {
-				p.Cancel()
-				return
-			}
-		case <-tick.C:
-			log.Println("sending ping message to", p.conn.RemoteAddr())
-			err := p.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(interval))
-			if err != nil {
-				p.Cancel()
-				return
-			}
-		case <-p.Ctx.Done():
-			return
-		}
-	}
-}
-
-func (p Player) updateConnected(connected bool) {
-	select {
-	case p.update <- ConnectionUpdate{p.ID, connected}:
-	case <-p.Ctx.Done():
-	}
 }
 
 // Run is the game runner thread. It continually receives from the "conn"
-// websocket connection until notified to stop by "ctx"
+// websocket connection until notified to stop by the connection-scoped
+// context. It parses each message and takes appropriate action on each based
+// on the verb passed.
 func (p Player) Run(ev chan GameAction) {
-	bail := func(why string) {
-		log.Println("websocket: closing due to error:", why)
-		p.conn.WriteControl(websocket.CloseMessage,
-			websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, why),
-			time.Now().Add(time.Second*10))
-		p.conn.Close()
-	}
-
-	lastPong := time.Now()
-	pongInterval, pongTimeout := time.Second*15, time.Second*10
-	p.conn.SetReadDeadline(lastPong.Add(pongInterval).Add(pongTimeout))
-	p.conn.SetPongHandler(func(appData string) error {
-		latency := time.Now().Add(-pongInterval).Sub(lastPong)
-		if latency < 0 {
-			latency = 0 - latency
+	p.Open()
+	defer func() {
+		select {
+		case ev <- ConnectionUpdate{p.ID, false}:
+		case <-p.Ctx.Done():
 		}
 
-		log.Println("got pong response with latency", latency, "from", p.conn.RemoteAddr())
-		lastPong = time.Now()
-		p.conn.SetReadDeadline(lastPong.Add(pongInterval).Add(pongTimeout))
-		return nil
-	})
-
-	go p.writer(pongInterval)
-	defer func() {
-		p.updateConnected(false)
 		p.Cancel()
 		log.Printf("%s (nick: %q) disconnected", p.conn.RemoteAddr(), p.Nick)
 	}()
 
 readloop:
 	for {
-		t, msg, err := p.conn.ReadMessage()
-		switch {
-		case err != nil:
-			p.conn.Close()
-			return
-		case t == websocket.PingMessage || t == websocket.PongMessage:
-			continue readloop
-		case t == websocket.CloseMessage:
-			return
-		case t == websocket.BinaryMessage:
-			bail("expected text messages, got binary")
+		cmd, _, err := p.ReadString()
+		if err != nil {
+			log.Println(err)
+			p.CloseReason(err.Error())
 			return
 		}
-		log.Println("got message from", p.conn.RemoteAddr().String(), ":", msg)
+
+		// TODO: Go through commands here
+		switch cmd {
+		}
 
 		select {
 		case <-p.Ctx.Done():
@@ -142,23 +59,7 @@ readloop:
 		}
 	}
 
-	// If we got here, the game is done and the player instance is exiting
-	// Send the final goodbyes
-	p.conn.WriteControl(websocket.CloseMessage,
-		websocket.FormatCloseMessage(websocket.CloseNormalClosure, "game over"),
-		time.Now().Add(time.Second*10))
-	p.conn.Close()
-}
-
-// FormatMessage returns the client-readable form of the message consisting of
-// the verb "command" and arguments from data in JSON form
-func FormatMessage(command string, data interface{}) string {
-	var payload []byte
-	if data == nil {
-		payload = []byte{}
-	} else {
-		payload, _ = json.Marshal(data)
-	}
-
-	return command + " " + string(payload)
+	// If we reach here, we are gracefully ending the player session
+	// error-free
+	p.Close()
 }

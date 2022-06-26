@@ -30,11 +30,12 @@ func (p AddPlayer) Perform(game *Game) {
 	// Runner has not yet started and the context must be re-created on
 	// re-connection
 	game.state.Players = append(game.state.Players, Player{
-		ID:        len(game.state.Players) + 1,
-		Nick:      p.Nick,
-		Connected: false,
-		Send:      make(chan string),
-		update:    game.Action,
+		ID:   len(game.state.Players) + 1,
+		Nick: p.Nick,
+		Client: Client{
+			Connected: false,
+			Send:      make(chan string),
+		},
 	})
 
 	p.ID <- len(game.state.Players)
