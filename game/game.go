@@ -30,10 +30,10 @@ const (
 	MinPlayers  = 3
 )
 
-// stateFunc is a current state in the finite state machine of the game state.
-// It returns a new stateFunc that will replace it after it returns and could
+// StateFunc is a current state in the finite state machine of the game state.
+// It returns a new StateFunc that will replace it after it returns and could
 // simply be itself
-type stateFunc func() stateFunc
+type StateFunc func() StateFunc
 
 // GameState is the current state of an ongoing, running game instance. This is
 // separated into a separate struct for ease of passing around combined game
@@ -57,7 +57,7 @@ type Game struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	state  GameState
-	sf     stateFunc
+	sf     StateFunc
 }
 
 func NewGame(pin GamePin, reaper chan GamePin, maxGameTime time.Duration) Game {
@@ -84,6 +84,7 @@ func (game *Game) Run() {
 	defer func() {
 		game.state.Status = GameDead
 		game.reaper <- game.PIN
+		game.cancel()
 	}()
 
 	// Loop until our statefunc tells us that we are dead (nil state).
@@ -102,21 +103,33 @@ func (game *Game) Run() {
 	}
 }
 
-func (game *Game) WaitForHost() stateFunc {
+// WaitForHost is the state while the host is still in the process of
+// connecting.
+func (game *Game) WaitForHost() StateFunc {
 	game.state.Status = GameHostWaiting
+
+	if game.state.Host != nil {
+		return game.WaitForPlayers
+	}
 	return game.WaitForHost
 }
 
-func (game *Game) WaitForPlayers() stateFunc {
-	if len(game.state.Players) >= MinPlayers {
-		return game.GameStarting
-	}
-
+// WaitForPlayers is the state while we are waiting on the host to start
+// the game.
+func (game *Game) WaitForPlayers() StateFunc {
 	game.state.Status = GameWaiting
 	return game.WaitForPlayers
 }
 
-func (game *Game) GameStarting() stateFunc {
+// GameStarting is the state while we are showing the game start screen
+// and title countdown.
+func (game *Game) GameStarting() StateFunc {
 	game.state.Status = GameRunning
+	return nil
+}
+
+// GameEnding is the state while we are showing the game end screen and
+// results summary, after which the game runner can shut down.
+func (game *Game) GameEnding() StateFunc {
 	return nil
 }
