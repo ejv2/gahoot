@@ -16,6 +16,50 @@ type GameAction interface {
 	Perform(game *Game)
 }
 
+type ConnectHost struct {
+	Conn *websocket.Conn
+}
+
+func (c ConnectHost) Perform(game *Game) {
+	// NOTE: There is no need, for now, to enforce a deadline, as players
+	// cannot connect before their host.
+	cl := Client{
+		Connected: true,
+		conn:      c.Conn,
+		Send:      nil,
+		Ctx:       context.Background(),
+	}
+	var id int32
+	verb, err := cl.ReadMessage(&id)
+	switch {
+	case err != nil:
+		cl.CloseReason(err.Error())
+		return
+	case verb != "host":
+		cl.CloseReason("expected first message to be HOST")
+		return
+	case game.state.Host != nil:
+		cl.CloseReason("game already has a host")
+		return
+	}
+
+	deadline, ok := game.ctx.Deadline()
+	if !ok {
+		panic("connecthost: found game with no deadline")
+	}
+
+	ctx, cancel := context.WithDeadline(game.ctx, deadline)
+	game.state.Host = &Host{
+		Client: Client{
+			Connected: true,
+			conn:      c.Conn,
+			Ctx:       ctx,
+			Cancel:    cancel,
+			Send:      make(chan string),
+		},
+	}
+}
+
 // AddPlayer allocates a new slot on the server for one player to join and
 // returns an ID for this player, which is the index into the players array.
 // This ID will then be used by the websocket to request to join the game.

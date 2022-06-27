@@ -41,7 +41,7 @@ type stateFunc func() stateFunc
 // itself and its state.
 type GameState struct {
 	Status  GameStatus
-	Host    Host
+	Host    *Host
 	Players []Player
 }
 
