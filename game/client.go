@@ -150,6 +150,14 @@ func (c Client) Read(buf []byte) (int, error) {
 	return len(msg), nil
 }
 
+// Write sends a message to the client, always formatted as a string. This
+// method may ONLY be called after Open() and always returns successfully. An
+// unsuccessful call will close the websocket connection.
+func (c Client) Write(msg []byte) (int, error) {
+	c.Send <- string(msg)
+	return len(msg), nil
+}
+
 // ReadString reads a single message from the client and returns the verb, data
 // and any errors encountered. Errors returned are usually fatal to the client.
 func (c Client) ReadString() (string, string, error) {
