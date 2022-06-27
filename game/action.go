@@ -168,3 +168,26 @@ func (c ConnectionUpdate) Perform(game *Game) {
 	// PlayerID is the human-readable ID, so subtract one
 	game.state.Players[c.PlayerID-1].Connected = c.Connected
 }
+
+// EndGame shuts down the game runner, thereby terminating the current
+// game.
+//
+// If the shutdown is clean, the state is merely shifted to the GameEnding
+// state, which allows for the final leaderboard to be shown.
+// If the shutdown was NOT clean, the state is immediately set to nil and
+// the game runner shuts down on the spot. This is usually used when the
+// host disconnects.
+type EndGame struct {
+	Reason string
+	Clean  bool
+}
+
+func (e EndGame) Perform(game *Game) {
+	if e.Clean {
+		game.sf = game.GameEnding
+		return
+	}
+
+	game.sf = nil
+	game.cancel()
+}
