@@ -128,14 +128,6 @@ func (c Client) Close() {
 // and errors. Errors returned are fatal to the application and cannot be
 // recovered. The application read loop must terminate after the first error.
 func (c Client) Read(buf []byte) (int, error) {
-	bail := func(why string) {
-		log.Println("websocket: closing due to error:", why)
-		c.conn.WriteControl(websocket.CloseMessage,
-			websocket.FormatCloseMessage(websocket.CloseInvalidFramePayloadData, why),
-			time.Now().Add(time.Second*10))
-		c.conn.Close()
-	}
-
 	t, msg, err := c.conn.ReadMessage()
 	switch {
 	case err != nil:
@@ -146,7 +138,6 @@ func (c Client) Read(buf []byte) (int, error) {
 	case t == websocket.CloseMessage:
 		return 0, ErrorConnectionClosed
 	case t == websocket.BinaryMessage:
-		bail("expected text messages, got binary")
 		return 0, ErrorBadMessageType
 	}
 
