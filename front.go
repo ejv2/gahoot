@@ -32,7 +32,7 @@ func handleJoin(c *gin.Context) {
 		c.HTML(200, "join.gohtml", dat)
 	}
 	joinNick := func() {
-		c.HTML(200, "joinNick.gohtml", dat)
+		c.HTML(200, "join_nick.gohtml", dat)
 	}
 
 	// If PIN provided, second stage is needed - unless there is an error,
