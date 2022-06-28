@@ -85,7 +85,7 @@ func handleCreate(c *gin.Context) {
 }
 
 func handleFind(c *gin.Context) {
-	c.String(200, "Work in progress")
+	c.HTML(200, "create_find.gohtml", nil)
 }
 
 func handleUpload(c *gin.Context) {

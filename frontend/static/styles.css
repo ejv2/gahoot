@@ -99,7 +99,22 @@ input[type=submit] {
 
 .wizard-box-options {
 	align-content: center;
+	text-align: center;
 	min-width: 75vw;
+}
+
+.wizard-box-full {
+	align-content: center;
+	text-align: center;
+	min-width: 95vw;
+	min-height: 90vh;
+}
+
+@media only screen and (min-width: 768px) {
+	.wizard-box-full {
+		height: 90vh;
+		max-height: 90vh;
+	}
 }
 
 form.wizard-box, .wizard-box-vertical {
@@ -128,7 +143,6 @@ input.error {
 	justify-content: space-between;
 	min-height: 50px;
 	margin-top: 5px;
-	text-align: center;
 }
 
 .wizard-option:not(:nth-last-of-type(1)) {
@@ -171,4 +185,43 @@ input.error {
 	min-height: 25px;
 	text-align: center;
 	cursor: pointer;
+}
+
+.find-title {
+	border-bottom: 2px solid #ccc;
+	padding-bottom: 5px;
+}
+
+@media only screen and (min-width: 768px) {
+	.find-box {
+		display: grid;
+		grid-auto-flow: column;
+		grid-template-columns: 30% 70%;
+		height: 100%;
+		overflow-y: auto;
+	}
+
+	.find-dirs {
+		border-right: 2px solid #ccc;
+		height: 100%;
+		height: 100%;
+		max-height: 100%;
+		overflow-y: scroll;
+	}
+
+	.find-quizzes {
+		height: 100%;
+		overflow-y: scroll;
+	}
+}
+
+.find-dirs > h3, .find-quizzes > h3 {
+	border-bottom: 2px solid #ccc;
+	padding: 5px;
+}
+
+.find-dirs > div.find-item, .find-quizzes > div.find-item {
+	border-bottom: 2px solid #ccc;
+	margin: 0;
+	padding: 5px;
 }
