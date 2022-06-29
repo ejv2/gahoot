@@ -104,3 +104,8 @@ func (q Quiz) Hash() hash.Hash {
 
 	return q.hash
 }
+
+func (q Quiz) String() string {
+	h := q.Hash()
+	return fmt.Sprintf("%X", h.Sum(nil))
+}
