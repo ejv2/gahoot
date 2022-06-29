@@ -8,7 +8,7 @@ type Host struct {
 	Client
 }
 
-func (h Host) Run(ev chan GameAction) {
+func (h Host) Run(ev chan Action) {
 	h.Open()
 	defer func() {
 		select {

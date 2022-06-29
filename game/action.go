@@ -8,11 +8,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// A GameAction is some action which can be sent to the game runner goroutine
+// A Action is some action which can be sent to the game runner goroutine
 // to perform an action on live game data, synchronised with the rest of the
 // game. As these run on the runner thread, there is no need for any kind of
 // locking.
-type GameAction interface {
+type Action interface {
 	Perform(game *Game)
 }
 

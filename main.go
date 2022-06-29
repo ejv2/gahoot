@@ -25,7 +25,7 @@ const (
 // Application lifetime state.
 var (
 	Config      config.Config
-	Coordinator game.GameCoordinator
+	Coordinator game.Coordinator
 )
 
 // checkFrontend checks if the frontend directory is a valid, readable

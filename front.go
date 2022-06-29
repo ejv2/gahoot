@@ -23,7 +23,7 @@ func handleRoot(c *gin.Context) {
 // back to this page with an error or to the game page with the pin filled out.
 func handleJoin(c *gin.Context) {
 	dat := struct {
-		Pin        game.GamePin
+		Pin        game.Pin
 		PinValid   bool
 		PinPresent bool
 	}{}
@@ -45,7 +45,7 @@ func handleJoin(c *gin.Context) {
 			joinPin()
 			return
 		}
-		dat.Pin = game.GamePin(i)
+		dat.Pin = game.Pin(i)
 		if dat.Pin < 1 {
 			dat.PinValid = false
 			joinPin()

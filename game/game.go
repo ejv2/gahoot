@@ -19,10 +19,10 @@ const (
 	GameDead
 )
 
-// GameStatus is either waiting, running or dead.
+// Status is either waiting, running or dead.
 // See documentation on GameWaiting, GameRunning or GameDead for more
 // details.
-type GameStatus int
+type Status int
 
 // Gameplay constants.
 const (
@@ -35,32 +35,32 @@ const (
 // simply be itself.
 type StateFunc func() StateFunc
 
-// GameState is the current state of an ongoing, running game instance. This is
+// State is the current state of an ongoing, running game instance. This is
 // separated into a separate struct for ease of passing around combined game
 // state to other objects, as well as to separate methods which act on the game
 // itself and its state.
-type GameState struct {
-	Status  GameStatus
+type State struct {
+	Status  Status
 	Host    *Host
 	Players []Player
 }
 
 // Game is a single instance of a running game.
 type Game struct {
-	PIN GamePin
+	PIN Pin
 	quiz.Quiz
 
-	Action  chan GameAction
-	Request chan chan GameState
+	Action  chan Action
+	Request chan chan State
 
-	reaper chan GamePin
+	reaper chan Pin
 	ctx    context.Context
 	cancel context.CancelFunc
-	state  GameState
+	state  State
 	sf     StateFunc
 }
 
-func NewGame(pin GamePin, reaper chan GamePin, maxGameTime time.Duration) Game {
+func NewGame(pin Pin, reaper chan Pin, maxGameTime time.Duration) Game {
 	if maxGameTime == 0 {
 		maxGameTime = MaxGameTime
 	}
@@ -71,8 +71,8 @@ func NewGame(pin GamePin, reaper chan GamePin, maxGameTime time.Duration) Game {
 		reaper:  reaper,
 		ctx:     c,
 		cancel:  cancel,
-		Action:  make(chan GameAction),
-		Request: make(chan chan GameState),
+		Action:  make(chan Action),
+		Request: make(chan chan State),
 	}
 }
 

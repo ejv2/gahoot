@@ -29,7 +29,7 @@ func handleGame(c *gin.Context) {
 		UID int
 	}{}
 
-	id, pin := c.Param("pin"), game.GamePin(0)
+	id, pin := c.Param("pin"), game.Pin(0)
 	uid, intuid := c.Query("plr"), int(0)
 	if id == "" {
 		log.Panic("handlegame: no PIN parameter in required handler")
@@ -45,7 +45,7 @@ func handleGame(c *gin.Context) {
 		back()
 		return
 	}
-	pin = game.GamePin(i)
+	pin = game.Pin(i)
 	if !Coordinator.GameExists(pin) {
 		back()
 		return

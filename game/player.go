@@ -27,7 +27,7 @@ type Player struct {
 // websocket connection until notified to stop by the connection-scoped
 // context. It parses each message and takes appropriate action on each based
 // on the verb passed.
-func (p Player) Run(ev chan GameAction) {
+func (p Player) Run(ev chan Action) {
 	p.Open()
 	defer func() {
 		select {

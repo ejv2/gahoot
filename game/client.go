@@ -132,7 +132,7 @@ func (c Client) Read(buf []byte) (int, error) {
 	switch {
 	case err != nil:
 		c.conn.Close()
-		return 0, fmt.Errorf("client: websocket I/O: %w", err)
+		return 0, fmt.Errorf("client: %w", err)
 	case t == websocket.PingMessage || t == websocket.PongMessage:
 		return 0, nil
 	case t == websocket.CloseMessage:

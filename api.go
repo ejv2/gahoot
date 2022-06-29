@@ -45,7 +45,7 @@ func handlePlayAPI(c *gin.Context) {
 		return
 	}
 
-	g, ok := Coordinator.GetGame(game.GamePin(pin))
+	g, ok := Coordinator.GetGame(game.Pin(pin))
 	if !ok {
 		c.AbortWithStatus(404)
 		return
