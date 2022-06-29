@@ -64,29 +64,39 @@ func handlePlayAPI(c *gin.Context) {
 }
 
 // handleHostApi is the handler for "/api/host/{PIN}"
-
+//
 // Accepts an incoming request to host a game for a specific game PIN and
 // fabricates a new host from the provided data and simply hands off to the
 // game runner.
 //
 // NOTE: At this stage, no validation is performed. HOWEVER, this action will fail
 // if:
-//	- The game already has a host
 //	- The game does not exist
-//	- The game has already begun (could occur if the host loses connection)
 //
 // This websocket lasts the lifetime of a game. If the client disconnects for any
 // reason (missed hearbeats or manual disconnect), the game will be immediately
 // cancelled.
 func handleHostAPI(c *gin.Context) {
+	param := c.Param("pin")
+	pin, err := strconv.ParseUint(param, 10, 32)
+	if err != nil {
+		c.AbortWithStatus(400)
+		log.Println("API error:", err)
+		return
+	}
+
+	g, ok := Coordinator.GetGame(game.GamePin(pin))
+	if !ok {
+		c.AbortWithStatus(404)
+		return
+	}
+
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("host api failure:", err)
 		c.Abort()
 		return
 	}
-	log.Println("Got websocket host request from", conn.RemoteAddr())
 
-	conn.WriteMessage(websocket.CloseMessage, nil)
-	conn.Close()
+	g.Action <- game.ConnectHost{Conn: conn}
 }
