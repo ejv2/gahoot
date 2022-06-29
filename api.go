@@ -22,7 +22,7 @@ var (
 //
 // Accepts an incoming request to play a game for a specific game PIN and
 // fabricates a new user from the provided data before handing off control over
-// the websocket connection to the ongoing game runner
+// the websocket connection to the ongoing game runner.
 //
 // NOTE: API does not directly validate anything - simply hands off to the game
 // runner. HOWEVER, this action will fail if:

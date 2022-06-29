@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Gameplay constants with no need for configuration
+// Gameplay constants with no need for configuration.
 const (
 	MinGamePin = 1111111111
 	MaxGamePin = 4294967295
@@ -20,24 +20,24 @@ const (
 type GamePin uint32
 
 // String properly formats the game PIN such that any leading digits are
-// displayed properly as zeroes
+// displayed properly as zeroes.
 func (p GamePin) String() string {
 	return fmt.Sprintf("%010d", p)
 }
 
-// Validate returns true if a game pin is within the required limits
+// Validate returns true if a game pin is within the required limits.
 func (p GamePin) Validate() bool {
 	return p < MaxGamePin && p < MinGamePin
 }
 
 // generatePin generates a pseudorandom game PIN between MinGamePin and
-// MaxGamePin, ensuring to eliminate possible overflows
+// MaxGamePin, ensuring to eliminate possible overflows.
 func generatePin() GamePin {
 	return GamePin((rand.Uint32() + MinGamePin) % ((MaxGamePin + 1) - MinGamePin))
 }
 
 // GameCoordinator is responsible for managing all ongoing games in order to
-// receive and delegate incoming events
+// receive and delegate incoming events.
 type GameCoordinator struct {
 	mut        *sync.RWMutex // protects games
 	games      map[GamePin]Game

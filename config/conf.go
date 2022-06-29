@@ -4,7 +4,7 @@
 // Configuration consists of a simple text file, which contains a set of keys
 // defined via "key: value", where value may be blank. Trailing whitespace
 // before and after the "value" will be stripped, but any other valid UTF-8
-// characters may be otherwise
+// characters may be otherwise.
 package config
 
 import (
@@ -25,7 +25,7 @@ type Config struct {
 }
 
 // FullAddr returns the full address for use in serving based on both
-// ListenAddr and ListenPort in the format expected by net.Dial
+// ListenAddr and ListenPort in the format expected by net.Dial.
 func (c Config) FullAddr() string {
 	return fmt.Sprintf("%s:%d", c.ListenAddr, c.ListenPort)
 }

@@ -13,7 +13,7 @@ import (
 // handleHost is the handler for "/play/host/{game PIN}".
 //
 // Handles validation and filling in information before returning the hoster's
-// UI
+// UI.
 func handleHost(c *gin.Context) {
 }
 

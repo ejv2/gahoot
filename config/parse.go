@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// Parsing errors
+// Parsing errors.
 var (
 	ErrInvalidKey = errors.New("config: invalid key")
 	ErrUnknownKey = errors.New("config: unknown key")

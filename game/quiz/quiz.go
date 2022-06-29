@@ -11,9 +11,9 @@ import (
 	"time"
 )
 
-// Quiz handling constants
+// Quiz handling constants.
 const (
-	// MaxQuizSize is the 8 MB quiz size limit
+	// MaxQuizSize is the 8 MB quiz size limit.
 	MaxQuizSize = 8 * 1024 * 1024
 )
 

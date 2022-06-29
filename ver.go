@@ -1,6 +1,6 @@
 package main
 
-// Semantic version constants
+// Semantic version constants.
 const (
 	MajorVersion = 0
 	MinorVersion = 0

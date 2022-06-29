@@ -14,7 +14,7 @@ import (
 	"github.com/ethanv2/gahoot/game"
 )
 
-// Core application paths
+// Core application paths.
 const (
 	PathFrontend  = "frontend"
 	PathTemplates = PathFrontend + string(os.PathSeparator) + "templates"
@@ -22,14 +22,14 @@ const (
 	PathConfig    = "config.gahoot"
 )
 
-// Application lifetime state
+// Application lifetime state.
 var (
 	Config      config.Config
 	Coordinator game.GameCoordinator
 )
 
-// checkFrontend checks if the frontend directory
-// is a valid, readable directory
+// checkFrontend checks if the frontend directory is a valid, readable
+// directory.
 func checkFrontend() error {
 	_, err := os.ReadDir(PathFrontend)
 	if err != nil {

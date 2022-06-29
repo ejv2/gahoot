@@ -7,15 +7,15 @@ import (
 	"github.com/ethanv2/gahoot/game/quiz"
 )
 
-// Possible game states
+// Possible game states.
 const (
-	// Game is waiting for the host to connect
+	// Game is waiting for the host to connect.
 	GameHostWaiting = iota
-	// Game is waiting for sufficient players
+	// Game is waiting for sufficient players.
 	GameWaiting
-	// Game is currently live - no new players
+	// Game is currently live - no new players.
 	GameRunning
-	// Game is dead and waiting to be reaped
+	// Game is dead and waiting to be reaped.
 	GameDead
 )
 
@@ -24,7 +24,7 @@ const (
 // details.
 type GameStatus int
 
-// Gameplay constants
+// Gameplay constants.
 const (
 	MaxGameTime = time.Minute * 45
 	MinPlayers  = 3
@@ -32,7 +32,7 @@ const (
 
 // StateFunc is a current state in the finite state machine of the game state.
 // It returns a new StateFunc that will replace it after it returns and could
-// simply be itself
+// simply be itself.
 type StateFunc func() StateFunc
 
 // GameState is the current state of an ongoing, running game instance. This is
@@ -45,7 +45,7 @@ type GameState struct {
 	Players []Player
 }
 
-// Game is a single instance of a running game
+// Game is a single instance of a running game.
 type Game struct {
 	PIN GamePin
 	quiz.Quiz
