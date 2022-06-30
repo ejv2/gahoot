@@ -220,8 +220,36 @@ input.error {
 	padding: 5px;
 }
 
-.find-dirs > div.find-item, .find-quizzes > div.find-item {
+.find-dirs > div.find-item {
+	background-color: #45A3E5;
+	color: white;
+	cursor: pointer;
 	border-bottom: 2px solid #ccc;
+	border-radius: 5px;
 	margin: 0;
+	padding: 8px;
+}
+
+.find-dirs > div#shared {
+	background-color: var(--blue);
+}
+
+.find-dirs > div#all {
+	background-color: var(--green);
+}
+
+.find-quizzes > div.find-item {
+	text-align: left;
+	background-color: #ccc;
+	border-radius: 5px;
 	padding: 5px;
+	margin: 5px;
+}
+
+.item-top {
+	display: flex;
+	justify-content: space-between;
+}
+
+.item-description {
 }

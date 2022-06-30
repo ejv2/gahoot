@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <html>
+
 	<head>
 		{{template "head.gohtml"}}
 		{{template "title" "Find a Game File"}}
@@ -8,21 +9,50 @@
 
 	<body class="wizard">
 		<div class="wizard-box wizard-box-vertical wizard-box-full">
-			<h2 class="find-title">Find a Game</h1>
+			<h2 class="find-title">Find a Game</h2>
 			<div class="find-box">
 				<div class="find-dirs">
 					<h3>Categories</h3>
-					<div class="find-item">
+					<div class="find-item">a</div>
+					<div class="find-item">b</div>
+					<div class="find-item">c</div>
+					<div class="find-item">d</div>
+					<div class="find-item">e</div>
+					<hr>
+					<!-- Items uploaded via option 2 -->
+					<div class="find-item" id="shared">
 						Shared
 					</div>
-					<div class="find-item">
+					<!-- Literally everything -->
+					<div class="find-item" id="all">
 						All
 					</div>
 				</div>
-				<div class="find-list find-quizzes">
+				<div class="find-quizzes">
 					<h3>Quiz File</h3>
+
+					<div class="find-item">
+						<div class="item-top">
+							<p><strong>Quiz 1</strong> - by ethan_v2</p>
+							<a class="btn btn-primary item-play">Play</a>
+						</div>
+						<div class="item-description">
+							<small>Collapsable description</small>
+						</div>
+					</div>
+
+					<div class="find-item">
+						<div class="item-top">
+							<p><strong>Quiz 2</strong> - by scattman_john</p>
+							<a class="btn btn-primary item-play">Play</a>
+						</div>
+						<div class="item-description">
+							<small>Collapsable description</small>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</body>
+
 </html>
