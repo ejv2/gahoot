@@ -73,7 +73,7 @@ scanloop:
 func parse(c *Config, path string) error {
 	f, err := os.Open(path)
 	if err != nil {
-		return fmt.Errorf("open config failed: %w", err)
+		return fmt.Errorf("open config: %w", err)
 	}
 
 	s := bufio.NewScanner(f)

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator"
 
 	"github.com/ethanv2/gahoot/config"
 	"github.com/ethanv2/gahoot/game"
@@ -26,6 +27,8 @@ const (
 var (
 	Config      config.Config
 	Coordinator game.Coordinator
+
+	vd *validator.Validate
 )
 
 // checkFrontend checks if the frontend directory is a valid, readable
@@ -52,12 +55,14 @@ func main() {
 	rand.Seed(time.Now().UnixMilli())
 
 	// Init configs
-	Config, err = config.New(PathConfig)
+	vd = validator.New()
+	Config, err = config.New(PathConfig, vd)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			log.Fatal("config not found")
 		}
-		log.Fatal(err)
+
+		log.Fatalf("bad configuration:\n%s", config.FormatErrors(err))
 	}
 
 	// Init game coordinator
