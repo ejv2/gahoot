@@ -33,7 +33,7 @@ func (p Pin) Validate() bool {
 // generatePin generates a pseudorandom game PIN between MinGamePin and
 // MaxGamePin, ensuring to eliminate possible overflows.
 func generatePin() Pin {
-	return Pin((rand.Uint32() + MinGamePin) % ((MaxGamePin + 1) - MinGamePin))
+	return Pin(rand.Int63n(MaxGamePin-MinGamePin) + MinGamePin)
 }
 
 // Coordinator is responsible for managing all ongoing games in order to
