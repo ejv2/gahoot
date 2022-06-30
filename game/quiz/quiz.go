@@ -48,6 +48,7 @@ type Quiz struct {
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
 	Author      string     `json:"author"`
+	Category    string     `json:"category"`
 	Created     time.Time  `json:"created"`
 	Questions   []Question `json:"questions"`
 
