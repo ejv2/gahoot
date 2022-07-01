@@ -1,11 +1,27 @@
 package quiz_test
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
 	"github.com/ethanv2/gahoot/game/quiz"
 )
+
+// HashTests are calculated based on the final representation of the marshalled
+// struct, which includes every field, even if empty.
+var HashTests = [...]struct {
+	Source, Hash string
+}{
+	{
+		`{"title":"Quiz 2","description":"The second quiz"}`,
+		"4784B66B01CB131D7178E54586B3F9626EDBB0F9A72A649BEE72D9C1BB8E729B",
+	},
+	{
+		`{}`,
+		"ED6F2A1EDE24786BE75E6C74A76D7C598EDF857EFFC0C781A452A9E01BDA3262",
+	},
+}
 
 func generateLong(howLong int) string {
 	s := `{"name": "`
@@ -50,6 +66,24 @@ func TestLoadQuiz(t *testing.T) {
 			} else if !strings.Contains(err.Error(), elem.Expect) {
 				t.Errorf("loadquiz: wrong error: %s", err.Error())
 			}
+		}
+	}
+}
+
+func TestHash(t *testing.T) {
+	for _, elem := range HashTests {
+		sr := strings.NewReader(elem.Source)
+		q, err := quiz.LoadQuiz(sr, quiz.SourceUpload)
+
+		buf, _ := json.Marshal(q)
+		t.Log(string(buf))
+
+		if err != nil {
+			t.Error("unexpected error:", err.Error())
+		}
+
+		if q.String() != elem.Hash {
+			t.Errorf("invalid hash: got %s, expected %s", q.String(), elem.Hash)
 		}
 	}
 }
