@@ -1,7 +1,6 @@
 package quiz
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -95,16 +94,7 @@ func LoadQuiz(src io.Reader, origin int) (Quiz, error) {
 		return Quiz{}, fmt.Errorf("quiz: load: %w", err)
 	}
 
-	// As we have the source upfront, we can just calculate it now
-	// and cache value for later.
-	// NOTE: When this is done, we *cannot* modify quiz in memory
-	compact := bytes.NewBuffer(buf)
-	json.Compact(compact, buf)
-	q.hash = sha256.New()
-	q.hash.Write(compact.Bytes())
-
 	q.source = origin
-
 	return q, nil
 }
 

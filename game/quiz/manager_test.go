@@ -1,7 +1,6 @@
 package quiz
 
 import (
-	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -19,7 +18,9 @@ const (
 	ErrQuizDir = "testdata" + string(os.PathSeparator) + "errdir"
 )
 
-var QuizSources = [...]string{`{"title": "Quiz 2", "description": "The second quiz"}`}
+var QuizSources = [...]string{
+	`{"title": "Quiz 2", "description": "The second quiz"}`,
+}
 var QuizTests = []Quiz{
 	{
 		Title:       "Quiz 1",
@@ -28,7 +29,7 @@ var QuizTests = []Quiz{
 		Category:    "technology",
 		Created:     time.Now(),
 		Questions: []Question{
-			{"First question", new(url.URL),
+			{"First question", nil,
 				[]Answer{
 					{"1", false},
 				}},
@@ -42,11 +43,6 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-
-		if q.hash == nil {
-			panic("manager: init quiz not hashed")
-		}
-
 		QuizTests = append(QuizTests, q)
 	}
 }
@@ -118,5 +114,44 @@ func TestLoadDir(t *testing.T) {
 	}
 	if before != len(mgr.qs) {
 		t.Errorf("expected no change to quiz map, got %d change in length", before-len(mgr.qs))
+	}
+}
+
+func TestGetAll(t *testing.T) {
+	mgr := NewManager()
+	for _, elem := range QuizTests {
+		mgr.Load(elem)
+	}
+
+	if len(mgr.GetAll()) != len(QuizTests) {
+		t.Errorf("getall: expected %d entries, returned %d", len(QuizTests), len(mgr.GetAll()))
+	}
+}
+
+func TestConcurrent(t *testing.T) {
+	mgr := NewManager()
+
+	done := make(chan struct{}, len(QuizTests))
+	for _, elem := range QuizTests {
+		go func(e Quiz) {
+			mgr.Load(e)
+			done <- struct{}{}
+		}(elem)
+	}
+	for i := 0; i < len(QuizTests); i++ {
+		<-done
+	}
+
+	for _, elem := range QuizTests {
+		go func(e Quiz) {
+			ent := mgr.Get(e.Hash())
+			if ent.String() != e.String() {
+				t.Errorf("get returned incorrect value: got %v, expected %v", ent, e)
+			}
+			done <- struct{}{}
+		}(elem)
+	}
+	for i := 0; i < len(QuizTests); i++ {
+		<-done
 	}
 }

@@ -13,13 +13,13 @@ import (
 // on specified memory timeouts.
 type Manager struct {
 	mut *sync.RWMutex
-	qs  map[hash.Hash]Quiz
+	qs  map[string]Quiz
 }
 
 func NewManager() Manager {
 	return Manager{
 		mut: new(sync.RWMutex),
-		qs:  make(map[hash.Hash]Quiz),
+		qs:  make(map[string]Quiz),
 	}
 }
 
@@ -35,7 +35,7 @@ func (m *Manager) Load(q Quiz) error {
 
 // load is a non-synchronised version of Load which assumes that m.mut is held.
 func (m *Manager) load(q Quiz) error {
-	h := q.Hash()
+	h := q.String()
 	if _, ok := m.qs[h]; ok {
 		return fmt.Errorf("quizman: load: duplicate entry")
 	}
@@ -117,10 +117,10 @@ func (m *Manager) Get(h hash.Hash) Quiz {
 	m.mut.RLock()
 	defer m.mut.RUnlock()
 
-	return m.qs[h]
+	return m.qs[fmt.Sprintf("%X", h.Sum(nil))]
 }
 
-func (m *Manager) GetAll(h hash.Hash) []Quiz {
+func (m *Manager) GetAll() []Quiz {
 	m.mut.RLock()
 	defer m.mut.RUnlock()
 
