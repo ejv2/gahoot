@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 // Manager is the quiz manager, responsible for memory caching and loading new
@@ -39,6 +40,7 @@ func (m *Manager) load(q Quiz) error {
 	if _, ok := m.qs[h]; ok {
 		return fmt.Errorf("quizman: load: duplicate entry")
 	}
+	q.inserted = time.Now()
 
 	m.qs[h] = q
 	return nil

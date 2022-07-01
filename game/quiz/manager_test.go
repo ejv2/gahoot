@@ -48,9 +48,19 @@ func init() {
 func TestLoad(t *testing.T) {
 	mgr := NewManager()
 	for _, elem := range QuizTests {
+		start := time.Now()
 		err := mgr.Load(elem)
 		if err != nil {
 			t.Errorf("unexpected load error: %s", err.Error())
+		}
+
+		ret := mgr.Get(elem.Hash())
+		if ret.String() != elem.String() {
+			t.Errorf("unexpected load error: item not inserted")
+			continue
+		}
+		if ret.inserted.Sub(start) <= 0 || time.Since(ret.inserted) <= 0 {
+			t.Errorf("invalid insertion time: expected between %v and %v, got %v", start, time.Now(), ret.inserted)
 		}
 	}
 
