@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 )
 
 // LoadDirError is the error returned for non-fatal errors during crawling a
@@ -31,14 +32,18 @@ func (e LoadDirError) Error() string {
 // on specified memory timeouts.
 type Manager struct {
 	mut *sync.RWMutex
-	qs  map[string]Quiz
+	// qs maps a stringified hash value to a quiz
+	qs map[string]Quiz
+	// cats contains registered categories
+	cats map[string]bool
 }
 
 // NewManager allocates and returns a GameManager ready for use.
 func NewManager() Manager {
 	return Manager{
-		mut: new(sync.RWMutex),
-		qs:  make(map[string]Quiz),
+		mut:  new(sync.RWMutex),
+		qs:   make(map[string]Quiz),
+		cats: make(map[string]bool),
 	}
 }
 
@@ -59,6 +64,8 @@ func (m *Manager) load(q Quiz) error {
 		return fmt.Errorf("quizman: load: duplicate entry")
 	}
 	q.inserted = time.Now()
+
+	m.cats[q.Category] = true
 
 	m.qs[h] = q
 	return nil
@@ -163,4 +170,22 @@ func (m *Manager) GetAll() []Quiz {
 	}
 
 	return all
+}
+
+// GetCategories returns all recognised distinct categories from loaded game
+// archives. The returned slice is guaranteed to contain no duplicates or
+// unused categories.
+func (m *Manager) GetCategories() []string {
+	m.mut.RLock()
+	defer m.mut.RUnlock()
+
+	cats := make([]string, 0, len(m.cats))
+	for cat := range m.cats {
+		buf := []rune(cat)
+		buf[0] = unicode.ToTitle(buf[0])
+
+		cats = append(cats, string(buf))
+	}
+
+	return cats
 }
