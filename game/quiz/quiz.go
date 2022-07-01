@@ -109,7 +109,7 @@ func LoadQuiz(src io.Reader, origin int) (Quiz, error) {
 }
 
 func (q *Quiz) Hash() hash.Hash {
-	if q.hash != nil {
+	if q.hash == nil {
 		// NOTE: Deliberately not error checking here, as it is
 		// unlikely we will get a result insufficient for hashing
 		buf, _ := json.Marshal(q)
