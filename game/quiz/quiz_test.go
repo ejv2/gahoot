@@ -1,7 +1,6 @@
 package quiz_test
 
 import (
-	"encoding/json"
 	"strings"
 	"testing"
 

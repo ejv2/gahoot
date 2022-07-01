@@ -94,7 +94,7 @@ func (m *Manager) LoadFrom(path string) (Quiz, error) {
 func (m *Manager) LoadDir(path string) ([]Quiz, error) {
 	ent, err := os.ReadDir(path)
 	if err != nil {
-		return nil, fmt.Errorf("quizman loaddir: %w", err)
+		return nil, err
 	}
 
 	m.mut.Lock()
