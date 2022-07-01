@@ -123,6 +123,22 @@ func TestLoadDir(t *testing.T) {
 	if before != len(mgr.qs) {
 		t.Errorf("expected no change to quiz map, got %d change in length", before-len(mgr.qs))
 	}
+
+	e, ok := err.(LoadDirError)
+	if !ok {
+		t.Error("expected error to be LoadDirError")
+	}
+	if len(e) != 1 {
+		t.Errorf("expected 1 error, got %d", len(e))
+	}
+
+	_, err = mgr.LoadDir("doesnt-exist")
+	if _, ok := err.(LoadDirError); ok {
+		t.Error("expected fatal error to be returned unwrapped")
+	}
+	if !os.IsNotExist(err) {
+		t.Error("expected NotExist error, got:", err)
+	}
 }
 
 func TestGetAll(t *testing.T) {
