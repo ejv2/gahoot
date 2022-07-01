@@ -1,0 +1,19 @@
+{
+	"title": "Quiz from a file",
+	"description": "A quiz with the same name, but a different hash",
+	"author": "ethan_v2",
+	"category": "technology",
+	"created": "2004-07-01T12:50:50.258Z",
+	"questions": [
+		{
+			"title": "What is this file used for?",
+			"image_url": null,
+			"answers": [
+				{"title": "To test file loading", "correct": false},
+				{"title": "To test quiz file loading", "correct": false},
+				{"title": "To use up my disk space", "correct": false},
+				{"title": "To test if hashing works correctly", "correct": true}
+			]
+		}
+	]
+}

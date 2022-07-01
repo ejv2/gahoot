@@ -1,0 +1,19 @@
+{
+	"title": "Nested quiz from file",
+	"description": "This quiz was loaded from a nested directory",
+	"author": "ethan_v2",
+	"category": "technology",
+	"created": "2021-07-01T12:50:50.258Z",
+	"questions": [
+		{
+			"title": "What is this file used for?",
+			"image_url": null,
+			"answers": [
+				{"title": "To test quiz dir loading", "correct": true},
+				{"title": "To test quiz file loading", "correct": false},
+				{"title": "To use up my disk space", "correct": false},
+				{"title": "To see if I can write JSON by hand", "correct": false}
+			]
+		}
+	]
+}

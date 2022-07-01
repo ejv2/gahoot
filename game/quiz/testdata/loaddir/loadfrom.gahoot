@@ -1,0 +1,19 @@
+{
+	"title": "Quiz from directory",
+	"description": "This file was loaded from \"testdata/loaddir\"",
+	"author": "ethan_v2",
+	"category": "technology",
+	"created": "2021-07-01T12:50:50.258Z",
+	"questions": [
+		{
+			"title": "What is this file used for?",
+			"image_url": null,
+			"answers": [
+				{"title": "To test file loading", "correct": false},
+				{"title": "To test quiz directory loading", "correct": true},
+				{"title": "To use up my disk space", "correct": false},
+				{"title": "To see if I can write JSON by hand", "correct": false}
+			]
+		}
+	]
+}

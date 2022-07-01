@@ -1,0 +1,14 @@
+{
+	"title": "Malformed quiz from file",
+	"description": "Whoops! For got to close this string!
+	"author": "ethan_v2",
+	"category": "technology",
+	"created": 0,
+	"questions": [
+		{
+			"title": "What is this file used for?",
+			"image_url": null,
+			"answers": [
+		}
+	]
+}
