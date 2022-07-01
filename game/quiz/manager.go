@@ -5,9 +5,26 @@ import (
 	"hash"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 )
+
+// LoadDirError is the error returned for non-fatal errors during crawling a
+// directory. To prevent errors in a single file prevent all other files being
+// loaded, the process is not stopped unless an error which makes it impossible
+// to continue is encountered. Instead, errors are added to this error, which
+// is an alias for a slice of errors.
+type LoadDirError []error
+
+func (e LoadDirError) Error() string {
+	sb := &strings.Builder{}
+	for _, elem := range e {
+		sb.WriteString(elem.Error() + "\n")
+	}
+
+	return sb.String()
+}
 
 // Manager is the quiz manager, responsible for memory caching and loading new
 // quizzes into memory, as well as handling periodic cleans of the cache, based
@@ -17,6 +34,7 @@ type Manager struct {
 	qs  map[string]Quiz
 }
 
+// NewManager allocates and returns a GameManager ready for use.
 func NewManager() Manager {
 	return Manager{
 		mut: new(sync.RWMutex),
@@ -69,6 +87,10 @@ func (m *Manager) LoadFrom(path string) (Quiz, error) {
 	return q, nil
 }
 
+// LoadDir recursively loads all quiz archives from path and any descendent
+// directories. If no errors are encountered, error is nil. If any non-fatal
+// errors were encountered, error is LoadDirError, which is a slice of other
+// errors. Fatal errors are returned as-is.
 func (m *Manager) LoadDir(path string) ([]Quiz, error) {
 	ent, err := os.ReadDir(path)
 	if err != nil {
@@ -79,6 +101,7 @@ func (m *Manager) LoadDir(path string) ([]Quiz, error) {
 	defer m.mut.Unlock()
 
 	qs := make([]Quiz, 0, len(m.qs)+len(ent))
+	errs := make(LoadDirError, 0)
 	for _, elem := range ent {
 		full := filepath.Join(path, elem.Name())
 
@@ -87,7 +110,8 @@ func (m *Manager) LoadDir(path string) ([]Quiz, error) {
 			sub, err := m.LoadDir(full)
 			m.mut.Lock()
 			if err != nil {
-				return nil, err
+				errs = append(errs, err)
+				continue
 			}
 
 			qs = append(qs, sub...)
@@ -96,25 +120,31 @@ func (m *Manager) LoadDir(path string) ([]Quiz, error) {
 
 		f, err := os.Open(full)
 		if err != nil {
-			return nil, fmt.Errorf("quizman loaddir: %w", err)
+			errs = append(errs, err)
+			continue
 		}
 
 		q, err := LoadQuiz(f, SourceFilesystem)
 		if err != nil {
-			return nil, fmt.Errorf("quizman loaddir: %w", err)
+			errs = append(errs, err)
+			continue
+		}
+		err = m.load(q)
+		if err != nil {
+			errs = append(errs, err)
+			continue
 		}
 
 		qs = append(qs, q)
-
-		err = m.load(q)
-		if err != nil {
-			return nil, fmt.Errorf("quizman loaddir: %w", err)
-		}
 	}
 
-	return qs, nil
+	if len(errs) == 0 {
+		return qs, nil
+	}
+	return qs, errs
 }
 
+// Get fetches a quiz with the corresponding hash.
 func (m *Manager) Get(h hash.Hash) Quiz {
 	m.mut.RLock()
 	defer m.mut.RUnlock()
@@ -122,6 +152,7 @@ func (m *Manager) Get(h hash.Hash) Quiz {
 	return m.qs[fmt.Sprintf("%X", h.Sum(nil))]
 }
 
+// GetAll returns every registered quiz from the quiz map.
 func (m *Manager) GetAll() []Quiz {
 	m.mut.RLock()
 	defer m.mut.RUnlock()
