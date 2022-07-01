@@ -69,7 +69,16 @@ func main() {
 
 	// Init quizzes
 	QuizManager = quiz.NewManager()
-	QuizManager.LoadDir(Config.QuizPath)
+	qs, err := QuizManager.LoadDir(Config.QuizPath)
+	if err != nil {
+		if warns, ok := err.(quiz.LoadDirError); ok {
+			for _, elem := range warns {
+				log.Println("WARNING: loading quiz store:", elem)
+			}
+		} else {
+			log.Fatal("error loading quiz store:", err)
+		}
+	}
 
 	// Init game coordinator
 	Coordinator = game.NewCoordinator(Config.GameTimeout)
@@ -78,6 +87,9 @@ func main() {
 	// Banner
 	log.Printf("Gahoot! v%d.%d.%d server starting...", MajorVersion, MinorVersion, PatchVersion)
 	log.Printf("Server listening on %s", Config.FullAddr())
+	if len(qs) > 0 {
+		log.Printf("Loaded %d quizzes from disk", len(qs))
+	}
 
 	// Startup and listen
 	router := gin.New()
