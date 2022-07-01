@@ -75,9 +75,6 @@ func TestHash(t *testing.T) {
 		sr := strings.NewReader(elem.Source)
 		q, err := quiz.LoadQuiz(sr, quiz.SourceUpload)
 
-		buf, _ := json.Marshal(q)
-		t.Log(string(buf))
-
 		if err != nil {
 			t.Error("unexpected error:", err.Error())
 		}
