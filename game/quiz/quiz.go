@@ -17,6 +17,16 @@ const (
 	MaxQuizSize = 8 * 1024 * 1024
 )
 
+// Quiz sources. Used for internal bookkeeping.
+const (
+	// Loaded from the filesystem at startup.
+	SourceFilesystem = iota
+	// Loaded from a server peer.
+	SourceNetwork
+	// Loaded from a user upload.
+	SourceUpload
+)
+
 // An Answer is one option in a single question in a quiz.
 // It is simply a response title and a boolean for if the response is
 // acceptable as correct.
@@ -31,8 +41,8 @@ type Answer struct {
 // response.
 type Question struct {
 	Title    string   `json:"title"`
-	ImageURL url.URL  `json:"image_url"`
-	Answers  []Answer `json:"answer"`
+	ImageURL *url.URL `json:"image_url"`
+	Answers  []Answer `json:"answers"`
 }
 
 // A Quiz represents a quiz which can be played in Gahoot. It is indirectly
@@ -52,11 +62,15 @@ type Quiz struct {
 	Created     time.Time  `json:"created"`
 	Questions   []Question `json:"questions"`
 
-	// hash is only used when hash is pre-calculated
-	hash hash.Hash
+	// Internal variables for bookkeeping
+	hash     hash.Hash
+	inserted time.Time
+	source   int
 }
 
-func LoadQuiz(src io.Reader) (Quiz, error) {
+// LoadQuiz buffers and parses a quiz archive file, returning the loaded
+// object. Origin is the game source used.
+func LoadQuiz(src io.Reader, origin int) (Quiz, error) {
 	r := io.LimitReader(src, MaxQuizSize)
 	buf, err := io.ReadAll(r)
 
@@ -89,10 +103,12 @@ func LoadQuiz(src io.Reader) (Quiz, error) {
 	q.hash = sha256.New()
 	q.hash.Write(compact.Bytes())
 
+	q.source = origin
+
 	return q, nil
 }
 
-func (q Quiz) Hash() hash.Hash {
+func (q *Quiz) Hash() hash.Hash {
 	if q.hash != nil {
 		// NOTE: Deliberately not error checking here, as it is
 		// unlikely we will get a result insufficient for hashing
@@ -100,6 +116,7 @@ func (q Quiz) Hash() hash.Hash {
 		h := sha256.New()
 		h.Write(buf)
 
+		q.hash = h
 		return h
 	}
 

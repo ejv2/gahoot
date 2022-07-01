@@ -38,7 +38,7 @@ func TestLoadQuiz(t *testing.T) {
 
 	for _, elem := range tests {
 		sr := strings.NewReader(elem.Source)
-		_, err := quiz.LoadQuiz(sr)
+		_, err := quiz.LoadQuiz(sr, quiz.SourceUpload)
 
 		if elem.ShouldOk {
 			if err != nil {

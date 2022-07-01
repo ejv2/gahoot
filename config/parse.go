@@ -100,6 +100,8 @@ func parse(c *Config, path string) error {
 			c.ListenPort, err = strconv.ParseUint(trail, 10, 64)
 		case "proxies":
 			c.TrustedProxies, err = parseArray(s, &num, trail)
+		case "quiz_dir":
+			c.QuizPath = trail
 		case "game_timeout":
 			i, e := strconv.ParseInt(trail, 10, 32)
 			c.GameTimeout, err = time.Second*time.Duration(i), e

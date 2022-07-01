@@ -13,6 +13,7 @@ import (
 
 	"github.com/ethanv2/gahoot/config"
 	"github.com/ethanv2/gahoot/game"
+	"github.com/ethanv2/gahoot/game/quiz"
 )
 
 // Core application paths.
@@ -27,6 +28,7 @@ const (
 var (
 	Config      config.Config
 	Coordinator game.Coordinator
+	QuizManager quiz.Manager
 
 	vd *validator.Validate
 )
@@ -64,6 +66,10 @@ func main() {
 
 		log.Fatalf("bad configuration:\n%s", config.FormatErrors(err))
 	}
+
+	// Init quizzes
+	QuizManager = quiz.NewManager()
+	QuizManager.LoadDir(Config.QuizPath)
 
 	// Init game coordinator
 	Coordinator = game.NewCoordinator(Config.GameTimeout)

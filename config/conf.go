@@ -20,6 +20,8 @@ type Config struct {
 	ListenPort     uint64   `validate:"gte=1,lte=65535"`
 	TrustedProxies []string `validate:"dive,ip_addr"`
 
+	QuizPath string `validate:"dir"`
+
 	GameTimeout time.Duration
 }
 
