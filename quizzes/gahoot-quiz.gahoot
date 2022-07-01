@@ -1,0 +1,39 @@
+{
+	"title": "Introduction to Gahoot!",
+	"description": "An introduction to how you can use and play Gahoot!",
+	"author": "ethan_v2",
+	"category": "technology",
+	"created": "2022-07-01T23:16:00+01:00",
+	"questions": [
+		{
+			"title": "What is Gahoot?",
+			"image_url": null,
+			"answers": [
+				{"title": "A website", "correct": true},
+				{"title": "An emulator", "correct": true},
+				{"title": "An IRC bot", "correct": false},
+				{"title": "A neural network", "correct": false}
+			]
+		},
+		{
+			"title": "What does Gahoot do?",
+			"image_url": null,
+			"answers": [
+				{"title": "Allows archiving your photographs", "correct": false},
+				{"title": "Connects people together, for free", "correct": false},
+				{"title": "Emulates Kahoot! on your machine for free", "correct": true},
+				{"title": "Automatically downloads BitTorrent files", "connect": false}
+			]
+		},
+		{
+			"title": "What is the purpose of this quiz?",
+			"image_url": null,
+			"answers": [
+				{"title": "To introduce you to your own keyboard", "correct": false},
+				{"title": "To introduce you to Gahoot gameplay", "correct": true},
+				{"title": "To introduce you to the Gahoot developers", "correct": false},
+				{"title": "To introduce you to how to use your Gahoot site", "correct": true}
+			]
+		}
+	]
+}
