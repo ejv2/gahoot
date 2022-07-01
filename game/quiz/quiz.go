@@ -98,6 +98,11 @@ func LoadQuiz(src io.Reader, origin int) (Quiz, error) {
 	return q, nil
 }
 
+// Hash returns the unique hash associated with this game instance. Hashes for
+// Gahoot game archives are performed based on JSON output including EVERY
+// field in the struct, even if those were not present in the original version.
+// This prevents the addition of blank fields to a JSON document from
+// completely changing the hash.
 func (q *Quiz) Hash() hash.Hash {
 	if q.hash == nil {
 		// NOTE: Deliberately not error checking here, as it is
@@ -113,6 +118,7 @@ func (q *Quiz) Hash() hash.Hash {
 	return q.hash
 }
 
+// String returns a stringified representation of this Quiz's unique hash.
 func (q Quiz) String() string {
 	h := q.Hash()
 	return fmt.Sprintf("%X", h.Sum(nil))
