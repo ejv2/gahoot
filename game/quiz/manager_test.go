@@ -18,9 +18,7 @@ const (
 	ErrQuizDir = "testdata" + string(os.PathSeparator) + "errdir"
 )
 
-var QuizSources = [...]string{
-	`{"title": "Quiz 2", "description": "The second quiz"}`,
-}
+var QuizSources = [...]string{`{"title": "Quiz 2", "description": "The second quiz"}`}
 var QuizTests = []Quiz{
 	{
 		Title:       "Quiz 1",
