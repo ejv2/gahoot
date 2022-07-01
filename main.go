@@ -125,6 +125,9 @@ func main() {
 		create.GET("/find", handleFind)
 		create.GET("/upload", handleUpload)
 		create.GET("/new", handleEditor)
+
+		create.GET("/game/", handleBlankCreateGame)
+		create.GET("/game/:hash", handleCreateGame)
 	}
 
 	play := router.Group("/play/")

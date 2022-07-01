@@ -13,11 +13,9 @@
 			<div class="find-box">
 				<div class="find-dirs">
 					<h3>Categories</h3>
-					<div class="find-item">a</div>
-					<div class="find-item">b</div>
-					<div class="find-item">c</div>
-					<div class="find-item">d</div>
-					<div class="find-item">e</div>
+					{{range .Categories}}
+					<div class="find-item" id="shared">{{.}}</div>
+					{{end}}
 					<hr>
 					<!-- Items uploaded via option 2 -->
 					<div class="find-item" id="shared">
@@ -31,25 +29,31 @@
 				<div class="find-quizzes">
 					<h3>Quiz File</h3>
 
+					{{range .Quizzes}}
 					<div class="find-item">
 						<div class="item-top">
-							<p><strong>Quiz 1</strong> - by ethan_v2</p>
-							<a class="btn btn-primary item-play">Play</a>
+							<p><strong>{{.Title}}</strong> - by {{.Author}}</p>
+							<a href="/create/game/{{.}}" class="btn btn-primary item-play">Play</a>
 						</div>
 						<div class="item-description">
-							<small>Collapsable description</small>
-						</div>
-					</div>
+							<details>
+								<p>{{.Description}}</p>
+								<hr>
+								<strong>Author:</strong> {{.Author}}
+								<br>
+								<strong>Questions:</strong> {{len .Questions}}
+								<br>
+								<strong>Category:</strong> {{.Category}}
+								<br>
+								<strong>Created:</strong> {{.Created}}
 
-					<div class="find-item">
-						<div class="item-top">
-							<p><strong>Quiz 2</strong> - by scattman_john</p>
-							<a class="btn btn-primary item-play">Play</a>
-						</div>
-						<div class="item-description">
-							<small>Collapsable description</small>
+								<br>
+								<br>
+								<small><strong>SHA256:</strong> {{.}}</small>
+							</details>
 						</div>
 					</div>
+					{{end}}
 				</div>
 			</div>
 		</div>

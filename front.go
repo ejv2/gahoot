@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/ethanv2/gahoot/game"
+	"github.com/ethanv2/gahoot/game/quiz"
 )
 
 // handleRoot is the handler for "/".
@@ -85,7 +86,15 @@ func handleCreate(c *gin.Context) {
 }
 
 func handleFind(c *gin.Context) {
-	c.HTML(200, "create_find.gohtml", nil)
+	dat := struct {
+		Quizzes    []quiz.Quiz
+		Categories []string
+	}{
+		Quizzes:    QuizManager.GetAll(),
+		Categories: QuizManager.GetCategories(),
+	}
+
+	c.HTML(200, "create_find.gohtml", dat)
 }
 
 func handleUpload(c *gin.Context) {
@@ -94,4 +103,17 @@ func handleUpload(c *gin.Context) {
 
 func handleEditor(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, "/")
+}
+
+func handleCreateGame(c *gin.Context) {
+	hash := c.Param("hash")
+	if hash == "" {
+		panic("required parameter missing")
+	}
+
+	c.Data(200, "text/plain", []byte("Coming soon: will create game " + hash))
+}
+
+func handleBlankCreateGame(c *gin.Context) {
+	c.Redirect(http.StatusMovedPermanently, "/create/")
 }
