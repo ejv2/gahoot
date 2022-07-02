@@ -21,6 +21,7 @@ interface Finder {
     SetCategory(now: string): void
     GetCategory(): string
     Match(name: string, category: string, online: boolean): boolean
+    UpdateNothing(n: boolean): boolean
     NothingMatched(): boolean
     Search(term: string): void
 }
@@ -38,6 +39,7 @@ document.addEventListener('alpine:init', () => {
                     now = "Uncategorised";
                 }
 
+                this.anyMatched = false
                 this.category = now.toLowerCase()
                 console.log(this.category)
             },
@@ -46,24 +48,27 @@ document.addEventListener('alpine:init', () => {
                 return this.category.toLowerCase()
             },
 
+            UpdateNothing(n: boolean): boolean {
+                if (!this.anyMatched) {
+                    this.anyMatched = n
+                }
+                return n
+            },
+
             Match(name: string, category: string, online: boolean): boolean {
                 if (this.search != null) {
                     if (name.toLowerCase().startsWith(this.search.toLowerCase())) {
-                        this.anyMatched = true
-                        return this.anyMatched
+                        return this.UpdateNothing(true)
                     }
 
-                    this.anyMatched = false
-                    return this.anyMatched
+                    return this.UpdateNothing(false)
                 }
 
                 if (online && this.category == CategoryUploads) {
-                    this.anyMatched = true
-                    return this.anyMatched
+                    return this.UpdateNothing(true)
                 }
 
-                this.anyMatched = this.category == CategoryAll || this.category == category.toLowerCase();
-                return this.anyMatched
+                return this.UpdateNothing(this.category == CategoryAll || this.category == category.toLowerCase())
             },
 
             Search(term: string) {
