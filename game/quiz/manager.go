@@ -181,6 +181,10 @@ func (m *Manager) GetCategories() []string {
 
 	cats := make([]string, 0, len(m.cats))
 	for cat := range m.cats {
+		if cat == "" {
+			cat = "Uncategorised"
+		}
+
 		buf := []rune(cat)
 		buf[0] = unicode.ToTitle(buf[0])
 
