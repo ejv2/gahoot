@@ -18,21 +18,21 @@
 
 					<!-- Other detected categories -->
 					{{range .Categories}}
-					<div class="find-item" :class="GetCategory() == '{{.}}'.toLowerCase() ? 'find-dirs-sel' : ''" @click="SetCategory('{{.}}')" title="Quizzes in category '{{.}}'">
+					<button class="find-item" :class="GetCategory() == '{{.}}'.toLowerCase() ? 'find-dirs-sel' : ''" @click="SetCategory('{{.}}')" title="Quizzes in category '{{.}}'">
 						{{.}}
-					</div>
+					</button>
 					{{end}}
 
 					<hr>
 
 					<!-- Items uploaded via option 2 -->
-					<div class="find-item" :class="GetCategory() == 'shared' ? 'find-dirs-sel' : ''" id="shared" @click="SetCategory('Shared')" title="Show quizzes uploaded by users">
+					<button class="find-item" :class="GetCategory() == 'shared' ? 'find-dirs-sel' : ''" id="shared" @click="SetCategory('Shared')" title="Show quizzes uploaded by users">
 						Shared
-					</div>
+					</button>
 					<!-- Literally everything -->
-					<div class="find-item" :class="GetCategory() == 'all' ? 'find-dirs-sel' : ''" id="all" @click="SetCategory('All')" title="Show all quizzes">
+					<button class="find-item" :class="GetCategory() == 'all' ? 'find-dirs-sel' : ''" id="all" @click="SetCategory('All')" title="Show all quizzes">
 						All
-					</div>
+					</button>
 				</div>
 				<div class="find-quizzes">
 					<h3>Quiz File</h3>

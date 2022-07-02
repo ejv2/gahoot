@@ -224,28 +224,31 @@ input.error {
 	padding: 5px;
 }
 
-.find-dirs > div.find-item {
+.find-dirs > button.find-item {
+	width: 100%;
+	border: none;
 	background-color: #45A3E5;
 	color: white;
 	cursor: pointer;
 	border-radius: 5px;
 	margin: 0;
 	margin-bottom: 2px;
-	padding: 8px;
+	padding: 12px;
+	font-size: 15px;
 }
 
 .find-dirs-sel {
-	border: 3px solid var(--orange);
+	border: 3px solid var(--orange) !important;
 	border-radius: 5px;
 	text-decoration: underline;
 	font-weight: bold;
 }
 
-.find-dirs > div#shared {
+.find-dirs > button#shared {
 	background-color: var(--blue);
 }
 
-.find-dirs > div#all {
+.find-dirs > button#all {
 	background-color: var(--green);
 }
 
