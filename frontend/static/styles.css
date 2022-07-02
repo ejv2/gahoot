@@ -228,10 +228,17 @@ input.error {
 	background-color: #45A3E5;
 	color: white;
 	cursor: pointer;
-	border-bottom: 2px solid #ccc;
 	border-radius: 5px;
 	margin: 0;
+	margin-bottom: 2px;
 	padding: 8px;
+}
+
+.find-dirs-sel {
+	border: 3px solid var(--orange);
+	border-radius: 5px;
+	text-decoration: underline;
+	font-weight: bold;
 }
 
 .find-dirs > div#shared {

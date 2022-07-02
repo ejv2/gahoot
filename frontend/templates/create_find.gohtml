@@ -15,16 +15,22 @@
 			<div class="find-box">
 				<div class="find-dirs">
 					<h3>Categories</h3>
+
+					<!-- Other detected categories -->
 					{{range .Categories}}
-					<div class="find-item" @click="SetCategory('{{.}}')">{{.}}</div>
+					<div class="find-item" :class="GetCategory() == '{{.}}'.toLowerCase() ? 'find-dirs-sel' : ''" @click="SetCategory('{{.}}')" title="Quizzes in category '{{.}}'">
+						{{.}}
+					</div>
 					{{end}}
+
 					<hr>
+
 					<!-- Items uploaded via option 2 -->
-					<div class="find-item" id="shared" @click="SetCategory('Shared')">
+					<div class="find-item" :class="GetCategory() == 'shared' ? 'find-dirs-sel' : ''" id="shared" @click="SetCategory('Shared')" title="Show quizzes uploaded by users">
 						Shared
 					</div>
 					<!-- Literally everything -->
-					<div class="find-item" id="all" @click="SetCategory('All')">
+					<div class="find-item" :class="GetCategory() == 'all' ? 'find-dirs-sel' : ''" id="all" @click="SetCategory('All')" title="Show all quizzes">
 						All
 					</div>
 				</div>
