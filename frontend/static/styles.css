@@ -224,6 +224,14 @@ input.error {
 	padding: 5px;
 }
 
+.find-quizzes > input {
+	width: calc(100% - 10px);
+	margin-right: 0;
+	margin-left: 0px;
+	border: 2px solid #ccc;
+	border-radius: 5px;
+}
+
 .find-dirs > button.find-item {
 	width: 100%;
 	border: none;

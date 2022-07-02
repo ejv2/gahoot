@@ -37,6 +37,7 @@
 				<div class="find-quizzes">
 					<h3>Quiz File</h3>
 
+					<input @input="Search()" x-model="search" title="Search all quizzes" placeholder="Search quizzes"></input>
 					{{range .Quizzes}}
 					<div class="find-item" x-show="Match('{{.Title}}', '{{.FriendlyCategory}}', {{.Remote}})">
 						<div class="item-top">

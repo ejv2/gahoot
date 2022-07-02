@@ -15,7 +15,7 @@ window.Alpine = Alpine;
 
 interface Finder {
     category: string
-    search: string | null
+    search: string
     anyMatched: boolean
 
     SetCategory(now: string): void
@@ -23,7 +23,7 @@ interface Finder {
     Match(name: string, category: string, online: boolean): boolean
     UpdateNothing(n: boolean): boolean
     NothingMatched(): boolean
-    Search(term: string): void
+    Search(): void
 }
 
 document.addEventListener('alpine:init', () => {
@@ -31,7 +31,7 @@ document.addEventListener('alpine:init', () => {
         // Cast allows for dynamic type checking by TypeScript
         return <Finder>{
             category: CategoryAll,
-            search: null,
+            search: "",
             anyMatched: false,
 
             SetCategory(now: string) {
@@ -40,8 +40,8 @@ document.addEventListener('alpine:init', () => {
                 }
 
                 this.anyMatched = false
+                this.search = ""
                 this.category = now.toLowerCase()
-                console.log(this.category)
             },
 
             GetCategory(): string {
@@ -56,7 +56,7 @@ document.addEventListener('alpine:init', () => {
             },
 
             Match(name: string, category: string, online: boolean): boolean {
-                if (this.search != null) {
+                if (this.search != "") {
                     if (name.toLowerCase().startsWith(this.search.toLowerCase())) {
                         return this.UpdateNothing(true)
                     }
@@ -71,9 +71,8 @@ document.addEventListener('alpine:init', () => {
                 return this.UpdateNothing(this.category == CategoryAll || this.category == category.toLowerCase())
             },
 
-            Search(term: string) {
+            Search() {
                 this.category = CategoryAll;
-                this.search = term;
             }
         };
     })
