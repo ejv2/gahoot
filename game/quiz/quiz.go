@@ -118,6 +118,20 @@ func (q *Quiz) Hash() hash.Hash {
 	return q.hash
 }
 
+// Remote returns if this quiz was obtained from a remote source.
+func (q Quiz) Remote() bool {
+	return q.source != SourceFilesystem
+}
+
+// Category returns category if it is non-empty, else "Uncategorised".
+func (q Quiz) FriendlyCategory() string {
+	if q.Category == "" {
+		return "Uncategorised"
+	}
+
+	return q.Category
+}
+
 // String returns a stringified representation of this Quiz's unique hash.
 func (q Quiz) String() string {
 	h := q.Hash()

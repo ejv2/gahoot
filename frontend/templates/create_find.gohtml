@@ -5,24 +5,26 @@
 	<head>
 		{{template "head.gohtml"}}
 		{{template "title" "Find a Game File"}}
+
+		<script type="module" src="/static/js/find.js"></script>
 	</head>
 
 	<body class="wizard">
-		<div class="wizard-box wizard-box-vertical wizard-box-full">
+		<div x-data="finder" class="wizard-box wizard-box-vertical wizard-box-full">
 			<h2 class="find-title">Find a Game</h2>
 			<div class="find-box">
 				<div class="find-dirs">
 					<h3>Categories</h3>
 					{{range .Categories}}
-					<div class="find-item" id="shared">{{.}}</div>
+					<div class="find-item" @click="SetCategory('{{.}}')">{{.}}</div>
 					{{end}}
 					<hr>
 					<!-- Items uploaded via option 2 -->
-					<div class="find-item" id="shared">
+					<div class="find-item" id="shared" @click="SetCategory('Shared')">
 						Shared
 					</div>
 					<!-- Literally everything -->
-					<div class="find-item" id="all">
+					<div class="find-item" id="all" @click="SetCategory('All')">
 						All
 					</div>
 				</div>
@@ -30,7 +32,7 @@
 					<h3>Quiz File</h3>
 
 					{{range .Quizzes}}
-					<div class="find-item">
+					<div class="find-item" x-show="Match('{{.Title}}', '{{.FriendlyCategory}}', {{.Remote}})">
 						<div class="item-top">
 							<p><strong>{{.Title}}</strong> - by {{.Author}}</p>
 							<a href="/create/game/{{.}}" class="btn btn-primary item-play">Play</a>
@@ -43,7 +45,7 @@
 								<br>
 								<strong>Questions:</strong> {{len .Questions}}
 								<br>
-								<strong>Category:</strong> {{.Category}}
+								<strong>Category:</strong> {{.FriendlyCategory}}
 								<br>
 								<strong>Created:</strong> {{.Created}}
 
@@ -54,6 +56,11 @@
 						</div>
 					</div>
 					{{end}}
+
+					<div x-show="!anyMatched">
+						<p>No matching results</p>
+						<a href="/create/upload">Upload one instead?</a>
+					</div>
 				</div>
 			</div>
 		</div>
