@@ -19,9 +19,13 @@ html, body {
 }
 
 a {
-	color: white;
+	color: var(--blue);
 	font-weight: bold;
 	text-decoration: none;
+}
+
+a.contrast {
+	color: white !important;
 }
 
 a:hover {
