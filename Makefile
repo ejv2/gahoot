@@ -3,11 +3,11 @@
 
 SRV_SRC = main.go front.go play.go api.go ver.go \
 	  config/conf.go config/parse.go \
-	  game/game.go game/doc.go game/coordinator.go game/client.go game/player.go game/action.go \
+	  game/game.go game/doc.go game/coordinator.go game/client.go game/host.go game/player.go game/action.go \
 	  game/quiz/quiz.go game/quiz/manager.go
 EXE     = gahoot
 
-TSC_SRC = frontend/src/index.ts frontend/src/play.ts frontend/src/find.ts
+TSC_SRC = frontend/src/index.ts frontend/src/play.ts frontend/src/host.ts frontend/src/find.ts
 TSC_OUT = frontend/static/js/index.js frontend/static/js/play.js
 TSC_DEP = frontend/node_modules
 
