@@ -185,11 +185,9 @@ type EndGame struct {
 }
 
 func (e EndGame) Perform(game *Game) {
-	if e.Clean {
-		game.sf = game.GameEnding
-		return
-	}
+	game.sf = game.GameEnding
 
-	game.sf = nil
-	game.cancel()
+	if !e.Clean {
+		game.cancel()
+	}
 }
