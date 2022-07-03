@@ -60,7 +60,7 @@ type Game struct {
 	sf     StateFunc
 }
 
-func NewGame(pin Pin, reaper chan Pin, maxGameTime time.Duration) Game {
+func NewGame(pin Pin, quiz quiz.Quiz, reaper chan Pin, maxGameTime time.Duration) Game {
 	if maxGameTime == 0 {
 		maxGameTime = MaxGameTime
 	}
@@ -68,6 +68,7 @@ func NewGame(pin Pin, reaper chan Pin, maxGameTime time.Duration) Game {
 	c, cancel := context.WithTimeout(context.Background(), maxGameTime)
 	return Game{
 		PIN:     pin,
+		Quiz:    quiz,
 		reaper:  reaper,
 		ctx:     c,
 		cancel:  cancel,

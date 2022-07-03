@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/ethanv2/gahoot/game/quiz"
 )
 
 // Gameplay constants with no need for configuration.
@@ -78,13 +80,13 @@ func (c *Coordinator) reaper() {
 // connection, generating a random PIN by continually regenerating a random PIN
 // until a free one is found. If the maximum concurrent games are running,
 // blocks until one is available (which hopefully should occur *very* rarely).
-func (c *Coordinator) CreateGame() Game {
+func (c *Coordinator) CreateGame(q quiz.Quiz) Game {
 	p := generatePin()
 	for c.GameExists(p) {
 		p = generatePin()
 	}
 
-	g := NewGame(p, c.reapNotify, c.maxTime)
+	g := NewGame(p, q, c.reapNotify, c.maxTime)
 	c.mut.Lock()
 	c.games[g.PIN] = g
 	c.mut.Unlock()
