@@ -13,7 +13,7 @@ const (
 	GameHostWaiting = iota
 	// Game is waiting for sufficient players.
 	GameWaiting
-	// Game is currently live - no new players.
+	// Game is currently live.
 	GameRunning
 	// Game is dead and waiting to be reaped.
 	GameDead
