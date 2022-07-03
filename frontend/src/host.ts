@@ -25,24 +25,18 @@ window.Alpine = Alpine
 // of this class for the changes to be reflected in the DOM.
 class HostState {
     private pin: number
-    private uid: number
 
     private state: common.GameState<HostState>
 
     connected: boolean
-    points: number
-    rank: number
 
     // Initializes data defaults
     //
     // NOTE: Does not do any interaction with events!
     // All event handlers must be hooked in init()
-    constructor(game: number, user: number) {
+    constructor(game: number) {
         this.connected = false
-        this.points = this.rank = 0
-
         this.pin = game
-        this.uid = user
 
         this.state = function e(ev: common.GameMessage): common.GameState<HostState> {
             console.log(ev)
@@ -64,7 +58,7 @@ class HostState {
     // Initializes the connection and internal state by sending the ident
     // packets
     initConn() {
-        common.SendMessage(conn, "ident", this.uid)
+        common.SendMessage(conn, "host", this.pin)
         console.log("authenticated to game " + this.pin.toString())
         this.handleConnection(true)
     }
@@ -95,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Joining game " + window.pin + " as the host")
 
     // Init our global objects
-    host = new HostState(window.pin, window.uid)
+    host = new HostState(window.pin)
 
     // Load information
     let url = common.HostEndpoint + window.pin.toString()

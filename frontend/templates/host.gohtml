@@ -4,12 +4,10 @@
 
 	<head>
 		{{template "head.gohtml"}}
-		{{template "title" "Play"}}
+		{{template "title" "Join the Game"}}
 
 		<script>
-			window.pin = {
-				{{.Pin}}
-			};
+			window.pin = {{.Pin}};
 		</script>
 		<script type="module" src="/static/js/host.js"></script>
 	</head>
