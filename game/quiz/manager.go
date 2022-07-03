@@ -162,7 +162,7 @@ func (m *Manager) Get(h hash.Hash) (Quiz, bool) {
 
 // GetString fetches a quiz with the corresponding stringfied hash.
 func (m *Manager) GetString(h string) (Quiz, bool) {
-	m.mut.Lock()
+	m.mut.RLock()
 	defer m.mut.RUnlock()
 
 	q, ok := m.qs[h]
