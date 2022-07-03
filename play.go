@@ -15,6 +15,28 @@ import (
 // Handles validation and filling in information before returning the hoster's
 // UI.
 func handleHost(c *gin.Context) {
+	dat := struct {
+		Pin uint32
+	}{}
+
+	spin := c.Param("pin")
+	if spin == "" {
+		log.Panic("handlehost: no PIN parameter in required handler")
+	}
+
+	back := func() {
+		c.Redirect(http.StatusSeeOther, "/new/")
+		c.Abort()
+	}
+
+	pin, err := strconv.ParseUint(spin, 10, 32)
+	if err != nil {
+		back()
+		return
+	}
+	dat.Pin = uint32(pin)
+
+	c.HTML(200, "host.gohtml", dat)
 }
 
 // handleGame is the handler for "/play/game/{game PIN}".
