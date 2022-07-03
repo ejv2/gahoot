@@ -8,9 +8,11 @@
 import * as common from "./common"
 import Alpine from "alpinejs"
 
+// Gameplay constants
+
 // Page lifetime variables
 let conn: WebSocket
-let plr: PlayerState
+let host: HostState
 
 // Set up alpine on the window
 // For debugging purposes
@@ -21,11 +23,11 @@ window.Alpine = Alpine
 // Any code which mutates the state of the application based
 // on events from the server or anything else *must* be a member
 // of this class for the changes to be reflected in the DOM.
-class PlayerState {
+class HostState {
     private pin: number
     private uid: number
 
-    private state: common.GameState<PlayerState>
+    private state: common.GameState<HostState>
 
     connected: boolean
     points: number
@@ -42,7 +44,7 @@ class PlayerState {
         this.pin = game
         this.uid = user
 
-        this.state = function e(ev: common.GameMessage): common.GameState<PlayerState> {
+        this.state = function e(ev: common.GameMessage): common.GameState<HostState> {
             console.log(ev)
             return this.state
         }
@@ -89,17 +91,17 @@ class PlayerState {
 
 // Main frontend init code
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("Gahoot! client scripts loaded")
-    console.log("Joining game " + window.pin + " as " + window.uid)
+    console.log("Gahoot! host scripts loaded")
+    console.log("Joining game " + window.pin + " as the host")
 
     // Init our global objects
-    plr = new PlayerState(window.pin, window.uid)
+    host = new HostState(window.pin, window.uid)
 
     // Load information
-    let url = common.PlayEndpoint + window.pin.toString()
+    let url = common.HostEndpoint + window.pin.toString()
     conn = new WebSocket(url)
 
     // Start tracking our data using Alpine
-    Alpine.store("game", plr)
+    Alpine.store("host", host)
     Alpine.start()
 })
