@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -98,7 +99,14 @@ func handleFind(c *gin.Context) {
 }
 
 func handleUpload(c *gin.Context) {
-	c.String(200, "Coming soon!")
+	dat := struct {
+		// Maximum file size in MB
+		FileSize int64
+	}{
+		FileSize: quiz.MaxQuizSize / (1024 * 1024),
+	}
+
+	c.HTML(200, "create_upload.gohtml", dat)
 }
 
 func handleEditor(c *gin.Context) {
@@ -108,10 +116,10 @@ func handleEditor(c *gin.Context) {
 func handleCreateGame(c *gin.Context) {
 	hash := c.Param("hash")
 	if hash == "" {
-		panic("required parameter missing")
+		log.Panic("handleCreateGame: no hash parameter in required handler")
 	}
 
-	c.Data(200, "text/plain", []byte("Coming soon: will create game " + hash))
+	c.String(200, "text/plain", "Coming soon: will create game "+hash)
 }
 
 func handleBlankCreateGame(c *gin.Context) {
