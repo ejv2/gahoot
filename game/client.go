@@ -71,6 +71,7 @@ func (c Client) writer(interval time.Duration) {
 			err := c.conn.WriteMessage(websocket.TextMessage, []byte(msg))
 			if err != nil {
 				c.Cancel()
+				c.CloseReason(err.Error())
 				return
 			}
 		case <-tick.C:
@@ -78,9 +79,11 @@ func (c Client) writer(interval time.Duration) {
 			err := c.conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(interval))
 			if err != nil {
 				c.Cancel()
+				c.CloseReason("invalid ping packet: " + err.Error())
 				return
 			}
 		case <-c.Ctx.Done():
+			c.Close()
 			return
 		}
 	}
