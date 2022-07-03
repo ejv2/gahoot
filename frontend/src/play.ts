@@ -70,6 +70,10 @@ class PlayerState {
     // handleConnection is called when a websocket connection changes state
     handleConnection(connected: boolean) {
         this.connected = connected
+
+        // TODO: Check here if current state was showing results.
+        // If it WAS NOT this state, redirect back to join page (host probably left).
+        // Else, do nothing and just terminate.
     }
 
     // handleMsg is called when a websocket message arrives
