@@ -29,8 +29,7 @@ func (c ConnectHost) Perform(game *Game) {
 		Send:      nil,
 		Ctx:       context.Background(),
 	}
-	var id int32
-	verb, err := cl.ReadMessage(&id)
+	verb, _, err := cl.ReadString()
 	switch {
 	case err != nil:
 		cl.CloseReason(err.Error())
@@ -58,6 +57,9 @@ func (c ConnectHost) Perform(game *Game) {
 			Send:      make(chan string),
 		},
 	}
+
+	log.Println("Host successfully joined", game.PIN.String())
+	go game.state.Host.Run(game.Action)
 }
 
 // AddPlayer allocates a new slot on the server for one player to join and
