@@ -152,11 +152,21 @@ func (m *Manager) LoadDir(path string) ([]Quiz, error) {
 }
 
 // Get fetches a quiz with the corresponding hash.
-func (m *Manager) Get(h hash.Hash) Quiz {
+func (m *Manager) Get(h hash.Hash) (Quiz, bool) {
 	m.mut.RLock()
 	defer m.mut.RUnlock()
 
-	return m.qs[fmt.Sprintf("%X", h.Sum(nil))]
+	q, ok := m.qs[fmt.Sprintf("%X", h.Sum(nil))]
+	return q, ok
+}
+
+// GetString fetches a quiz with the corresponding stringfied hash.
+func (m *Manager) GetString(h string) (Quiz, bool) {
+	m.mut.Lock()
+	defer m.mut.RUnlock()
+
+	q, ok := m.qs[h]
+	return q, ok
 }
 
 // GetAll returns every registered quiz from the quiz map.

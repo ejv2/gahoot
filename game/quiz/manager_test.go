@@ -54,7 +54,11 @@ func TestLoad(t *testing.T) {
 			t.Errorf("unexpected load error: %s", err.Error())
 		}
 
-		ret := mgr.Get(elem.Hash())
+		ret, ok := mgr.Get(elem.Hash())
+		if !ok {
+			t.Error("expected element to be found")
+			continue
+		}
 		if ret.String() != elem.String() {
 			t.Errorf("unexpected load error: item not inserted")
 			continue
@@ -168,7 +172,10 @@ func TestConcurrent(t *testing.T) {
 
 	for _, elem := range QuizTests {
 		go func(e Quiz) {
-			ent := mgr.Get(e.Hash())
+			ent, ok := mgr.Get(e.Hash())
+			if !ok {
+				t.Error("expected element to be found")
+			}
 			if ent.String() != e.String() {
 				t.Errorf("get returned incorrect value: got %v, expected %v", ent, e)
 			}
