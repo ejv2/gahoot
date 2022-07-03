@@ -116,7 +116,7 @@ func (c ConnectPlayer) Perform(game *Game) {
 		Send:      nil,
 		Ctx:       context.Background(),
 	}
-	var id int32
+	var id uint32
 	verb, err := cl.ReadMessage(&id)
 	if err != nil {
 		cl.CloseReason(err.Error())
@@ -129,7 +129,7 @@ func (c ConnectPlayer) Perform(game *Game) {
 	}
 
 	// Validate player object
-	if id > int32(len(game.state.Players)) || id <= 0 {
+	if id > uint32(len(game.state.Players)) {
 		cl.CloseReason("invalid player identifier")
 		return
 	} else if game.state.Players[id-1].Connected {
