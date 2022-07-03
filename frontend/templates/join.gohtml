@@ -9,7 +9,7 @@
 	</head>
 
 	<body class="full wizard">
-		<form class="wizard-box">
+		<form class="wizard-box wizard-box-vertical">
 			<input
 				{{if and .PinPresent (not .PinValid)}} class="error" {{end}}
 				{{if .Pin}}value="{{.Pin}}"{{end}}
