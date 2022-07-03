@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		{{template "head.gohtml"}}
+		{{template "title" "Play"}}
+
+		<script>
+			window.pin = {
+				{{.Pin}}
+			};
+		</script>
+		<script type="module" src="/static/js/host.js"></script>
+	</head>
+
+	<body x-init="$store.host.init()" x-data="$store.host" class="full wizard">
+	</body>
+
+</html>

@@ -119,7 +119,17 @@ func handleCreateGame(c *gin.Context) {
 		log.Panic("handleCreateGame: no hash parameter in required handler")
 	}
 
-	c.String(200, "text/plain", "Coming soon: will create game "+hash)
+	q, ok := QuizManager.GetString(hash)
+	if !ok {
+		c.Redirect(http.StatusSeeOther, "/new/find")
+		c.Abort()
+		return
+	}
+
+	g := Coordinator.CreateGame(q)
+	log.Println("Creating new game", g.PIN, "from quiz", q.String()[:12])
+
+	c.Redirect(http.StatusSeeOther, "/play/host/"+g.PIN.String())
 }
 
 func handleBlankCreateGame(c *gin.Context) {
