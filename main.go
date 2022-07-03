@@ -82,7 +82,6 @@ func main() {
 
 	// Init game coordinator
 	Coordinator = game.NewCoordinator(Config.GameTimeout)
-	log.Println("Generated test game", Coordinator.CreateGame().PIN)
 
 	// Banner
 	log.Printf("Gahoot! v%d.%d.%d server starting...", MajorVersion, MinorVersion, PatchVersion)
