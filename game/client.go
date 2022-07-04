@@ -16,9 +16,9 @@ import (
 // are variadic and separated by whitespace. The "<verb>" can be any of these
 // constants.
 const (
-	CommandQuestionOver = "qend"
 	CommandNewQuestion  = "ques"
-	CommandNewOptions   = "opts"
+	CommandAnswerAck    = "ansack"
+	CommandQuestionOver = "qend"
 	CommandSeeResults   = "res"
 )
 
