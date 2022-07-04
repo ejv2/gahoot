@@ -2,6 +2,7 @@
         --red: #EB21B3;
         --green: #26890C;
         --blue: #0542B9;
+        --lightblue: #45A3E5;
         --teal: #0AA3A3;
         --purple: #46178F;
         --orange: #EB670F;
@@ -239,7 +240,7 @@ input.error {
 .find-dirs>button.find-item {
         width: 100%;
         border: none;
-        background-color: #45A3E5;
+        background-color: var(--lightblue);
         color: white;
         cursor: pointer;
         border-radius: 5px;
@@ -278,3 +279,20 @@ input.error {
 }
 
 .item-description {}
+
+.game {
+        position: absolute;
+}
+
+.game-container {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+}
+
+.game-countdown {
+        background-color: var(--lightblue);
+}

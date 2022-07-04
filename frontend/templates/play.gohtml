@@ -13,9 +13,23 @@
 		<script type="module" src="/static/js/play.js"></script>
 	</head>
 
-	<body x-init="$store.game.init()" x-data="$store.game" class="full wizard">
-		<p x-text="points"></p>
-		<p x-show="!connected" style="color: var(--red);">NOT CONNECTED!</p>
+	<body x-init="$store.game.init()" x-data="$store.game" class="game">
+		<!-- Loading spinner -->
+		<div id="load-spinner" x-show="stateID == 1" class="game-container">
+			<img src="/static/assets/load-white.gif" style="color: var(--red);" />
+			<h2>Connecting to Gahoot</h2>
+		</div>
+
+		<!-- Waiting on host to start game -->
+		<div id="waiting" x-show="stateID == 2" class="game-container">
+			<h2>Waiting for host to start...</h2>
+			<p>See your name on screen?</p>
+		</div>
+
+		<div id="wait" x-show="stateID == 3" class="game-container game-countdown">
+			<img src="/static/assets/load-white.gif" />
+			<h1 x-text="countdownCount" />
+		</div>
 	</body>
 
 </html>
