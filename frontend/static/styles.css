@@ -20,6 +20,10 @@ body {
         padding: 0;
 }
 
+[x-cloak] {
+        display: none !important;
+}
+
 a {
         color: var(--blue);
         font-weight: bold;

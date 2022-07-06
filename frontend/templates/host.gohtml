@@ -14,7 +14,7 @@
 		<script src="/static/js/util.js"></script>
 	</head>
 
-	<body x-init="$store.host.init()" x-data="$store.host">
+	<body x-cloak x-init="$store.host.init()" x-data="$store.host">
 		<!-- Player join screen -->
 		<div id="player-joins" x-show="stateID == 1" class="game-container">
 			<template x-for="player in players">

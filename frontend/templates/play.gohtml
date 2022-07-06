@@ -13,7 +13,7 @@
 		<script type="module" src="/static/js/play.js"></script>
 	</head>
 
-	<body x-init="$store.game.init()" x-data="$store.game" class="game">
+	<body x-cloak x-init="$store.game.init()" x-data="$store.game" class="game">
 		<!-- Loading spinner -->
 		<div id="load-spinner" x-show="stateID == 1" class="game-container">
 			<img src="/static/assets/load-white.gif" style="color: var(--red);" />
