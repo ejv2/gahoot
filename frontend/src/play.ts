@@ -122,10 +122,12 @@ class PlayerState {
     // Initializes the connection and internal state by sending the ident
     // packets
     initConn() {
-        common.SendMessage(conn, "ident", this.uid)
-        console.log("authenticated to game " + this.pin.toString())
-        this.handleConnection(true)
-        this.stateID = States.Waiting
+        setTimeout(() => {
+            common.SendMessage(conn, "ident", this.uid)
+            console.log("authenticated to game " + this.pin.toString())
+            this.handleConnection(true)
+            this.stateID = States.Waiting
+        }, 700)
     }
 
     // handleConnection is called when a websocket connection changes state
