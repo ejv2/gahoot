@@ -142,6 +142,10 @@ class HostState {
 
         for (var i: number = 0; i < this.players.length; i++) {
             if (this.players[i].id == plr.id) {
+                if (!this.players[i].connected) {
+                    this.players[i].connected = true
+                    return this.state
+                }
                 console.warn("duplicate player join notification received!")
                 return this.state
             }
