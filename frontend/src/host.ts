@@ -54,6 +54,7 @@ class HostState {
     connected: boolean
 
     players: Player[]
+    startError: boolean
 
     // Initializes data defaults
     //
@@ -64,6 +65,7 @@ class HostState {
         this.pin = game
         this.title = title
         this.players = []
+        this.startError = false
 
         this.state = this.stateWaitingJoin
         this.stateID = States.JoinWaiting
@@ -189,6 +191,13 @@ class HostState {
     // Instructs the game server that the countdown has ended and the game must
     // start
     startGame(): void {
+        // Minimum three players require before starting
+        if (this.players.length < 3) {
+            this.startError = true
+            setTimeout(() => {this.startError = false}, 1000)
+            return
+        }
+
         this.stateID = States.StartCountdown
         common.SendMessage(conn, "count", {
             time: 10,

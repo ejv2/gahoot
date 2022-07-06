@@ -24,6 +24,7 @@
 			</template>
 
 			<button class="btn btn-blue" @click="$store.host.startGame()">Start game</button>
+			<p x-show="startError" class="error"><u>Three</u> players required to start</p>
 		</div>
 
 		<!-- Game start countdown -->
