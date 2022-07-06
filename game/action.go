@@ -226,7 +226,11 @@ func (k KickPlayer) Perform(game *Game) {
 type StartGame struct{}
 
 func (s StartGame) Perform(game *Game) {
+	if len(game.state.Players) < MinPlayers {
+		log.Println(game.PIN, "attempted to start with", len(game.state.Players), "(too few; rejected)")
+	}
 	game.sf = game.GameStarting
+	log.Println(game.PIN, "now commencing")
 }
 
 // EndGame shuts down the game runner, thereby terminating the current

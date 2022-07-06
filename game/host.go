@@ -34,6 +34,7 @@ readloop:
 
 		switch cmd {
 		case MessageStartGame:
+			ev <- StartGame{}
 		case MessageKick:
 			id, err := strconv.ParseInt(data, 10, 32)
 			if err != nil {
