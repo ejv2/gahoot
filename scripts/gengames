@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# gengames - utility to generate a test game and four users
+# opens all users in your browser (defaults to firefox)
+# $1 - Pass the URL of the site (works remotely) - default: localhost:8080
+
+BROWSER="${BROWSER:-firefox}"
+URL="${1:-localhost:8080}"
+
+CREATE="http://$URL/create/game/4A6F68208A642FEF57061AC23F6C98E8503C02F2368B47F1DC4F57FBF08F76C6"
+
+PIN=$(curl -Lv "$CREATE" 2>&1 \
+	| grep -oE "Location: \S+" \
+	| grep -Eo "[0-9]+")
+
+HOST="http://$URL/play/host/$PIN"
+JOIN="http://$URL/join?pin=$PIN&nick="
+
+$BROWSER "$HOST" &
+for nick in A B C D
+do
+	$BROWSER "$JOIN$nick" &
+done
