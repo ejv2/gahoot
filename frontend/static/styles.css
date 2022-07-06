@@ -66,6 +66,7 @@ input[type=submit] {
         color: white;
         padding: 15px;
         max-height: 50px;
+        border: none;
         border-radius 4px;
         user-select: none;
         font-weight: bold;
