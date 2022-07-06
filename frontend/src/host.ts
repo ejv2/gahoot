@@ -34,20 +34,26 @@ interface PlayerData {
     correct: number
 }
 
+interface Player extends PlayerData {
+    connected: boolean
+    loading: boolean
+}
+
 // PlayerState is the current datamodel for the client.
 //
 // Any code which mutates the state of the application based
 // on events from the server or anything else *must* be a member
 // of this class for the changes to be reflected in the DOM.
 class HostState {
-    private pin: number
+    pin: number
+    title: string
 
     private state: common.GameState<HostState>
     stateID: number
 
     connected: boolean
 
-    players: PlayerData[]
+    players: Player[]
 
     // Initializes data defaults
     //
@@ -56,6 +62,7 @@ class HostState {
     constructor(game: number, title: string) {
         this.connected = false
         this.pin = game
+        this.title = title
         this.players = []
 
         this.state = this.stateWaitingJoin
@@ -111,16 +118,28 @@ class HostState {
     stateWaitingJoin(ev: common.GameMessage): common.GameState<HostState> {
         this.stateID = States.JoinWaiting
 
-        // Start acknowledge
-        if (ev.action == "sack") {
-            // Start countdown
+
+        let plr = <PlayerData>ev.data
+        switch (ev.action) {
+            // Remove player
+            case "rmplr":
+                console.log("removed player "+plr.name)
+            this.players = this.players.filter(pl => pl.name != plr.name)
+            return this.state
+            case "dcplr":
+                // For now, also just remove the player
+                this.players.map(pl => {
+                if (pl.name == plr.name) {
+                    pl.connected = false
+                }
+            })
+            return this.state
         }
         if (ev.action != "plr") {
             console.warn("unexpected message: "+ev.action)
             return this.state
         }
 
-        let plr = <PlayerData>ev.data
         for (var i: number = 0; i < this.players.length; i++) {
             if (this.players[i].id == plr.id) {
                 console.warn("duplicate player join notification received!")
@@ -128,7 +147,15 @@ class HostState {
             }
         }
 
-        this.players.push(plr)
+        this.players.push({
+            id: plr.id,
+            name: plr.name,
+            score: plr.score,
+            correct: plr.correct,
+
+            connected: true,
+            loading: false,
+        })
         console.log(plr.name+" (ID: "+plr.id.toString()+") joined")
         return this.state
     }
@@ -159,6 +186,9 @@ class HostState {
     // start
     startGame(): void {
         this.stateID = States.StartCountdown
+        common.SendMessage(conn, "count", {
+            time: 10,
+        })
         setTimeout(() => {
             common.SendMessage(conn, "start", {})
         }, 10*1000)
@@ -167,6 +197,11 @@ class HostState {
 
     // Request the server to kick a player
     kickPlayer(id: number): void {
+        this.players.map(pl => {
+            if (pl.id == id) {
+                pl.loading = true
+            }
+        })
         common.SendMessage(conn, "kick", id)
     }
 }

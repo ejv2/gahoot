@@ -297,3 +297,17 @@ input.error {
 .game-countdown {
         background-color: var(--lightblue);
 }
+
+.host-nicknames {
+        font-weight: bold;
+        cursor: pointer;
+}
+
+.host-nicknames:hover {
+        text-decoration: line-through;
+}
+
+.host-nicknames-disconnected {
+        color: var(--red);
+        text-decoration: line-through;
+}

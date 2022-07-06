@@ -4,6 +4,15 @@ import (
 	"log"
 )
 
+// PlayerInfo is a message object, mirroring the PlayerData interface on
+// the client.
+type PlayerInfo struct {
+	ID int `json:"id"`
+	Nick string `json:"name"`
+	Score int64 `json:"score"`
+	Correct int `json:correct"`
+}
+
 // A Player is one registered player as part of a running game. Each player is
 // a wrapper around a single websocket connection combined with a runner
 // thread, which handles user-focused events, such as receiving answers or

@@ -185,6 +185,17 @@ type ConnectionUpdate struct {
 func (c ConnectionUpdate) Perform(game *Game) {
 	// PlayerID is the human-readable ID, so subtract one
 	game.state.Players[c.PlayerID-1].Connected = c.Connected
+
+	go func(id int) {
+		plr := game.state.Players[c.PlayerID-1]
+		dat := PlayerInfo{
+			ID:      plr.ID,
+			Nick:    plr.Nick,
+			Score:   plr.Score,
+			Correct: plr.Correct,
+		}
+		game.state.Host.Send <- FormatMessage(CommandDisconPlayer, dat)
+	}(c.PlayerID - 1)
 }
 
 type KickPlayer struct {
@@ -195,6 +206,17 @@ func (k KickPlayer) Perform(game *Game) {
 	game.state.Players[k.ID-1].Connected = false
 	game.state.Players[k.ID-1].Banned = true
 	game.state.Players[k.ID-1].Cancel()
+
+	go func(id int) {
+		plr := game.state.Players[k.ID-1]
+		dat := PlayerInfo{
+			ID:      plr.ID,
+			Nick:    plr.Nick,
+			Score:   plr.Score,
+			Correct: plr.Correct,
+		}
+		game.state.Host.Send <- FormatMessage(CommandRemovePlayer, dat)
+	}(k.ID - 1)
 }
 
 type StartGame struct{}

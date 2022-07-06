@@ -18,9 +18,10 @@
 		<!-- Player join screen -->
 		<div id="player-joins" x-show="stateID == 1" class="game-container">
 			<template x-for="player in players">
-				<div>
-					<p @click="$store.host.kickPlayer(player.id)" x-text="player.name" />
-				</div>
+				<p class="host-nicknames"
+					@click="$store.host.kickPlayer(player.id)"
+					x-text="player.name"
+					:class="player.connected ? '' : 'host-nicknames-disconnected'" />
 			</template>
 
 			<button class="btn btn-blue" @click="$store.host.startGame()">Start game</button>

@@ -160,7 +160,7 @@ class PlayerState {
         }
 
         this.countdownHndl = window.setInterval(() => {
-            this.countdownCount--
+            this.countdownCount--;
             if (this.countdownCount == 0) {
                 clearInterval(this.countdownHndl)
                 common.SendMessage(conn, "ack", {})
@@ -216,13 +216,13 @@ class PlayerState {
         this.rank = this.feedback.placement
 
         switch (ev.action) {
-        case "quend":
-            break
-        case "res":
-            this.stateID = States.Finished
+            case "quend":
+                break
+            case "res":
+                this.stateID = States.Finished
             return this.stateEnding
-        default:
-            console.warn("Expecting results/feedback, got " + ev.action)
+            default:
+                console.warn("Expecting results/feedback, got " + ev.action)
             return this.state
         }
 

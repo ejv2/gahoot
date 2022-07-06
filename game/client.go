@@ -21,16 +21,18 @@ const (
 	CommandQuestionOver = "qend"
 	CommandSeeResults   = "res"
 
-	CommandNewPlayer = "plr"
-	CommandStartAck  = "sack"
+	CommandNewPlayer    = "plr"
+	CommandRemovePlayer = "rmplr"
+	CommandDisconPlayer = "dcplr"
+	CommandStartAck     = "sack"
 )
 
 // WebSocket client message commands.
 // Client equivalent of server message commands. See documentation for server
 // message commands for more details on format.
 const (
-	MessageAcknowledge = "ack"
 	MessageIdenfity    = "ident"
+	MessageAcknowledge = "ack"
 	MessageAnswer      = "ans"
 
 	MessageKick      = "kick"
