@@ -126,7 +126,7 @@ func (game *Game) WaitForPlayers() StateFunc {
 // and title countdown.
 func (game *Game) GameStarting() StateFunc {
 	game.state.Status = GameRunning
-	return nil
+	return game.GameStarting
 }
 
 // GameEnding is the state while we are showing the game end screen and
