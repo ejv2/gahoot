@@ -143,6 +143,10 @@ func (c ConnectPlayer) Perform(game *Game) {
 		log.Println("banned ID", id, "attempted rejoin: rejected")
 		cl.CloseReason("ID banned")
 		return
+	} else if game.state.Host == nil {
+		log.Println("ID", id, "attempted to join before host")
+		cl.CloseReason("host not connected")
+		return
 	}
 
 	game.state.Players[id-1].Connected = true
