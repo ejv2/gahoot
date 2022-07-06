@@ -18,6 +18,22 @@ let host: HostState
 // For debugging purposes
 window.Alpine = Alpine
 
+enum States {
+    JoinWaiting = 1,
+    StartCountdown,
+    QuestionCountdown,
+    QuestionAsk,
+    QuestionAnswer,
+    GameOver
+}
+
+interface PlayerData {
+    id: number
+    name: string
+    score: number
+    correct: number
+}
+
 // PlayerState is the current datamodel for the client.
 //
 // Any code which mutates the state of the application based
@@ -27,21 +43,23 @@ class HostState {
     private pin: number
 
     private state: common.GameState<HostState>
+    stateID: number
 
     connected: boolean
+
+    players: PlayerData[]
 
     // Initializes data defaults
     //
     // NOTE: Does not do any interaction with events!
     // All event handlers must be hooked in init()
-    constructor(game: number) {
+    constructor(game: number, title: string) {
         this.connected = false
         this.pin = game
+        this.players = []
 
-        this.state = function e(ev: common.GameMessage): common.GameState<HostState> {
-            console.log(ev)
-            return this.state
-        }
+        this.state = this.stateWaitingJoin
+        this.stateID = States.JoinWaiting
     }
 
     // Initializes event listeners such that Alpine will track changes for us
@@ -59,13 +77,17 @@ class HostState {
     // packets
     initConn() {
         common.SendMessage(conn, "host", this.pin)
-        console.log("authenticated to game " + this.pin.toString())
+        console.log("now hosting game " + this.pin.toString())
         this.handleConnection(true)
     }
 
     // handleConnection is called when a websocket connection changes state
     handleConnection(connected: boolean) {
         this.connected = connected
+
+        if (!this.connected && this.stateID != States.GameOver) {
+            document.location.href = "/create/"
+        }
     }
 
     // handleMsg is called when a websocket message arrives
@@ -81,6 +103,72 @@ class HostState {
 
         this.state = this.state(msg)
     }
+
+    // STATE FUNCTIONS
+    // ---------------
+
+    // waiting on more joining, or a message signalling join ends
+    stateWaitingJoin(ev: common.GameMessage): common.GameState<HostState> {
+        this.stateID = States.JoinWaiting
+
+        // Start acknowledge
+        if (ev.action == "sack") {
+            // Start countdown
+        }
+        if (ev.action != "plr") {
+            console.warn("unexpected message: "+ev.action)
+            return this.state
+        }
+
+        let plr = <PlayerData>ev.data
+        for (var i: number = 0; i < this.players.length; i++) {
+            if (this.players[i].id == plr.id) {
+                console.warn("duplicate player join notification received!")
+                return this.state
+            }
+        }
+
+        this.players.push(plr)
+        console.log(plr.name+" (ID: "+plr.id.toString()+") joined")
+        return this.state
+    }
+
+    // message received signalling countdown ended
+    stateStartCountdown(ev: common.GameMessage): common.GameState<HostState> {
+        if (ev.action != "sack") {
+            if (ev.action != "plr") {
+                console.warn("unexpected message: "+ev.action)
+            }
+            return this.state
+        }
+
+        return this.stateQuestionCountdown
+    }
+
+    stateQuestionCountdown(ev: common.GameMessage): common.GameState<HostState> {
+        this.stateID = States.QuestionCountdown
+        return this.state
+    }
+
+    // FRONTEND FUNCTIONS
+    // ------------------
+
+    // Send the primary start message
+    //
+    // Instructs the game server that the countdown has ended and the game must
+    // start
+    startGame(): void {
+        this.stateID = States.StartCountdown
+        setTimeout(() => {
+            common.SendMessage(conn, "start", {})
+        }, 10*1000)
+        this.state = this.stateStartCountdown
+    }
+
+    // Request the server to kick a player
+    kickPlayer(id: number): void {
+        common.SendMessage(conn, "kick", id)
+    }
 }
 
 // Main frontend init code
@@ -89,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Joining game " + window.pin + " as the host")
 
     // Init our global objects
-    host = new HostState(window.pin)
+    host = new HostState(window.pin, window.title)
 
     // Load information
     let url = common.HostEndpoint + window.pin.toString()

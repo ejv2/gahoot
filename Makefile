@@ -8,7 +8,7 @@ SRV_SRC = main.go front.go play.go api.go ver.go \
 EXE     = gahoot
 
 TSC_SRC = frontend/src/index.ts frontend/src/play.ts frontend/src/host.ts frontend/src/find.ts
-TSC_OUT = frontend/static/js/index.js frontend/static/js/play.js
+TSC_OUT = frontend/static/js/index.js frontend/static/js/play.js frontend/static/js/host.js
 TSC_DEP = frontend/node_modules
 
 all: server frontend

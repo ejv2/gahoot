@@ -16,7 +16,8 @@ import (
 // UI.
 func handleHost(c *gin.Context) {
 	dat := struct {
-		Pin uint32
+		Title string
+		Pin   uint32
 	}{}
 
 	spin := c.Param("pin")
@@ -35,6 +36,14 @@ func handleHost(c *gin.Context) {
 		return
 	}
 	dat.Pin = uint32(pin)
+
+	g, ok := Coordinator.GetGame(game.Pin(dat.Pin))
+	if !ok {
+		c.Redirect(http.StatusSeeOther, "/create/")
+		c.Abort()
+		return
+	}
+	dat.Title = g.Title
 
 	c.HTML(200, "host.gohtml", dat)
 }

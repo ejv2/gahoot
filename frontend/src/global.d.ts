@@ -6,4 +6,5 @@ declare global {
     // Game details
     var uid: number
     var pin: number
+    var title: string
 }

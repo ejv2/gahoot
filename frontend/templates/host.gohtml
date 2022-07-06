@@ -8,11 +8,27 @@
 
 		<script>
 			window.pin = {{.Pin}};
+			window.title = {{.Title}};
 		</script>
 		<script type="module" src="/static/js/host.js"></script>
+		<script src="/static/js/util.js"></script>
 	</head>
 
-	<body x-init="$store.host.init()" x-data="$store.host" class="full wizard">
+	<body x-init="$store.host.init()" x-data="$store.host">
+		<!-- Player join screen -->
+		<div id="player-joins" x-show="stateID == 1" class="game-container">
+			<template x-for="player in players">
+				<div>
+					<p @click="$store.host.kickPlayer(player.id)" x-text="player.name" />
+				</div>
+			</template>
+
+			<button class="btn btn-blue" @click="$store.host.startGame()">Start game</button>
+		</div>
+
+		<!-- Game start countdown -->
+		<div id="start-countdown" x-show="stateID == 2">
+		</div>
 	</body>
 
 </html>
