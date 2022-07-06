@@ -21,6 +21,8 @@ type Player struct {
 	Nick    string
 	Score   int64
 	Correct int
+
+	Banned bool
 }
 
 // Run is the game runner thread. It continually receives from the "conn"

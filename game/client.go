@@ -20,6 +20,9 @@ const (
 	CommandAnswerAck    = "ansack"
 	CommandQuestionOver = "qend"
 	CommandSeeResults   = "res"
+
+	CommandNewPlayer = "plr"
+	CommandStartAck  = "sack"
 )
 
 // WebSocket client message commands.
@@ -29,6 +32,9 @@ const (
 	MessageAcknowledge = "ack"
 	MessageIdenfity    = "ident"
 	MessageAnswer      = "ans"
+
+	MessageKick      = "kick"
+	MessageStartGame = "start"
 )
 
 // Client mechanism constants.

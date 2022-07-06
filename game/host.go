@@ -1,9 +1,12 @@
 package game
 
-import "log"
+import (
+	"log"
+	"strconv"
+)
 
 // The Host of a game is the client which receives incoming question texts and
-// which handles type synchronisation for the rest of the game.
+// which handles time synchronisation for the rest of the game.
 type Host struct {
 	Client
 }
@@ -22,15 +25,21 @@ func (h Host) Run(ev chan Action) {
 
 readloop:
 	for {
-		cmd, _, err := h.ReadString()
+		cmd, data, err := h.ReadString()
 		if err != nil {
 			log.Println("host:", err)
 			h.CloseReason(err.Error())
 			return
 		}
 
-		// TODO: Go through commands here
 		switch cmd {
+		case MessageStartGame:
+		case MessageKick:
+			id, err := strconv.ParseInt(data, 10, 32)
+			if err != nil {
+				break
+			}
+			ev <- KickPlayer{int(id)}
 		}
 
 		select {

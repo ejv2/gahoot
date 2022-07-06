@@ -139,6 +139,12 @@ func (c ConnectPlayer) Perform(game *Game) {
 
 	// Player valid
 	// Go ahead and update player object
+	if game.state.Players[id-1].Banned {
+		log.Println("banned ID", id, "attempted rejoin: rejected")
+		cl.CloseReason("ID banned")
+		return
+	}
+
 	game.state.Players[id-1].Connected = true
 	game.state.Players[id-1].conn = c.Conn
 
@@ -154,6 +160,16 @@ func (c ConnectPlayer) Perform(game *Game) {
 
 	// Launch player runner
 	go game.state.Players[id-1].Run(game.Action)
+
+	// Inform host
+	inf := struct {
+		ID   int    `json:"id"`
+		Nick string `json:"name"`
+	}{game.state.Players[id-1].ID, game.state.Players[id-1].Nick}
+
+	go func() {
+		game.state.Host.Send <- FormatMessage(CommandNewPlayer, inf)
+	}()
 }
 
 // ConnectionUpdate submits a new connection state to the game loop.
@@ -169,6 +185,22 @@ type ConnectionUpdate struct {
 func (c ConnectionUpdate) Perform(game *Game) {
 	// PlayerID is the human-readable ID, so subtract one
 	game.state.Players[c.PlayerID-1].Connected = c.Connected
+}
+
+type KickPlayer struct {
+	ID int
+}
+
+func (k KickPlayer) Perform(game *Game) {
+	game.state.Players[k.ID-1].Connected = false
+	game.state.Players[k.ID-1].Banned = true
+	game.state.Players[k.ID-1].Cancel()
+}
+
+type StartGame struct{}
+
+func (s StartGame) Perform(game *Game) {
+	game.sf = game.GameStarting
 }
 
 // EndGame shuts down the game runner, thereby terminating the current
