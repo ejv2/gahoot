@@ -96,7 +96,7 @@ type ConnectPlayer struct {
 	fin  bool
 }
 
-func (c *ConnectPlayer) handleConnection(game Game) {
+func (c ConnectPlayer) handleConnection(game Game) {
 	// Enforce 30s handshake deadline to stop deadlocking of the game thread
 	c.Conn.SetReadDeadline(time.Now().Add(time.Second * 30))
 	defer c.Conn.SetReadDeadline(*new(time.Time))
@@ -130,7 +130,7 @@ func (c *ConnectPlayer) handleConnection(game Game) {
 	game.Action <- c
 }
 
-func (c *ConnectPlayer) handleInsertion(game *Game) {
+func (c ConnectPlayer) handleInsertion(game *Game) {
 	// Validate player object
 	if c.id > uint32(len(game.state.Players)) {
 		c.cl.CloseReason("invalid player identifier")
@@ -177,7 +177,7 @@ func (c *ConnectPlayer) handleInsertion(game *Game) {
 	game.state.Host.SendMessage(CommandNewPlayer, inf)
 }
 
-func (c *ConnectPlayer) Perform(game *Game) {
+func (c ConnectPlayer) Perform(game *Game) {
 	if !c.fin {
 		go c.handleConnection(*game)
 		return

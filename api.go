@@ -60,7 +60,7 @@ func handlePlayAPI(c *gin.Context) {
 	log.Println("Got websocket play request from", conn.RemoteAddr(), "for", pin)
 
 	// Hand off to the game runner, when its ready
-	g.Action <- &game.ConnectPlayer{Conn: conn}
+	g.Action <- game.ConnectPlayer{Conn: conn}
 }
 
 // handleHostApi is the handler for "/api/host/{PIN}"
