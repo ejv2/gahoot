@@ -86,18 +86,17 @@ func (p AddPlayer) Perform(game *Game) {
 	p.ID <- len(game.state.Players)
 }
 
-// TODO: This blocks the game thread until the player has joined.
-//
-// For now, "fixed" this by applying a freakishly short 30s authentication deadline,
-// which screws over people with bad internet.
-// To fix, create two methods on ConnectPlayer, one which starts a goroutine to handle
-// the handshake and one to add the player on the game thread. After the one in the
-// goroutine has finished, it enqueues *itself* in the game's Action queue.
+// ConnectPlayer initializes a player's connection, performs the startup
+// handshake asynchronously. When this is complete, submits a new action to the
+// game runner to update the player's state.
 type ConnectPlayer struct {
 	Conn *websocket.Conn
+	cl   Client
+	id   uint32
+	fin  bool
 }
 
-func (c ConnectPlayer) Perform(game *Game) {
+func (c *ConnectPlayer) handleConnection(game Game) {
 	// Enforce 30s handshake deadline to stop deadlocking of the game thread
 	c.Conn.SetReadDeadline(time.Now().Add(time.Second * 30))
 	defer c.Conn.SetReadDeadline(*new(time.Time))
@@ -110,68 +109,81 @@ func (c ConnectPlayer) Perform(game *Game) {
 	//
 	// DO NOT call cl.Init() and DO NOT call cl.Close{,Reason} unless there
 	// was a fatal error.
-	cl := Client{
+	c.cl = Client{
 		Connected: true,
 		conn:      c.Conn,
 		send:      nil,
 		Ctx:       context.Background(),
 	}
-	var id uint32
-	verb, err := cl.ReadMessage(&id)
+	verb, err := c.cl.ReadMessage(&c.id)
 	if err != nil {
-		cl.CloseReason(err.Error())
+		c.cl.CloseReason(err.Error())
 		return
 	}
 
 	if verb != "ident" {
-		cl.CloseReason("expected first message to be IDENT")
+		c.cl.CloseReason("expected first message to be IDENT")
 		return
 	}
 
+	c.fin = true
+	game.Action <- c
+}
+
+func (c *ConnectPlayer) handleInsertion(game *Game) {
 	// Validate player object
-	if id > uint32(len(game.state.Players)) {
-		cl.CloseReason("invalid player identifier")
+	if c.id > uint32(len(game.state.Players)) {
+		c.cl.CloseReason("invalid player identifier")
 		return
-	} else if game.state.Players[id-1].Connected {
-		cl.CloseReason("given ID already connected")
+	} else if game.state.Players[c.id-1].Connected {
+		c.cl.CloseReason("given ID already connected")
 		return
 	}
 
 	// Player valid
 	// Go ahead and update player object
-	if game.state.Players[id-1].Banned {
-		log.Println("banned ID", id, "attempted rejoin: rejected")
-		cl.CloseReason("ID banned")
+	if game.state.Players[c.id-1].Banned {
+		log.Println("banned ID", c.id, "attempted rejoin: rejected")
+		c.cl.CloseReason("ID banned")
 		return
 	} else if game.state.Host == nil {
-		log.Println("ID", id, "attempted to join before host")
-		cl.CloseReason("host not connected")
+		log.Println("ID", c.id, "attempted to join before host")
+		c.cl.CloseReason("host not connected")
 		return
 	}
 
-	game.state.Players[id-1].Connected = true
-	game.state.Players[id-1].conn = c.Conn
+	game.state.Players[c.id-1].Connected = true
+	game.state.Players[c.id-1].conn = c.Conn
 
 	// Add context for player
 	end, ok := game.ctx.Deadline()
 	if !ok {
 		panic("addplayer: found game with no deadline")
 	}
-	game.state.Players[id-1].Ctx,
-		game.state.Players[id-1].Cancel = context.WithDeadline(game.ctx, end)
+	game.state.Players[c.id-1].Ctx,
+		game.state.Players[c.id-1].Cancel = context.WithDeadline(game.ctx, end)
 
-	log.Printf("%s (ID: %d) successfully joined %d", game.state.Players[id-1].Nick, id, game.PIN)
+	log.Printf("%s (ID: %d) successfully joined %d", game.state.Players[c.id-1].Nick, c.id, game.PIN)
 
 	// Launch player runner
-	go game.state.Players[id-1].Run(game.Action)
+	go game.state.Players[c.id-1].Run(game.Action)
 
 	// Inform host
 	inf := struct {
 		ID   int    `json:"id"`
 		Nick string `json:"name"`
-	}{game.state.Players[id-1].ID, game.state.Players[id-1].Nick}
+	}{game.state.Players[c.id-1].ID, game.state.Players[c.id-1].Nick}
 
 	game.state.Host.SendMessage(CommandNewPlayer, inf)
+}
+
+func (c *ConnectPlayer) Perform(game *Game) {
+	if !c.fin {
+		go c.handleConnection(*game)
+		return
+	}
+
+	c.handleInsertion(game)
 }
 
 // ConnectionUpdate submits a new connection state to the game loop.
