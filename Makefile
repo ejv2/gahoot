@@ -30,11 +30,7 @@ ${TSC_DEP}:
 	cd frontend && npm install
 
 watch:
-	find -name "*.go" -print \
-		-or -name "*.ts" -print \
-		-or -name "node_modules" -prune \
-		-or -name ".genjs" -prune \
-		| entr -cs "pkill gahoot; make; ./gahoot &"; pkill gahoot
+	./scripts/watch
 
 frontwatch:
 	cd frontend && npm run watch

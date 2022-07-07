@@ -24,7 +24,7 @@ If the above doesn't work for you or if you are really having trouble compiling 
 
 Simply run ``make`` in the root. If you do not have ``tsc`` installed on your system, the Makefile will automatically run ``npm install`` for you to counteract your forgetfulness/laziness. You're welcome.
 
-If you are actively developing the program, run ``make watch`` and the server will be reloaded when there is a change to any source code (that includes restarting the server). You can quit by pressing 'q'. **DO NOT** quit using Control-C, as this will leave a dangling server instance running. If you did this, just run ``pkill gahoot``.
+If you are actively developing the program, run ``make watch`` and the server will be reloaded when there is a change to any source code (that includes restarting the server). This requires the BSD utility ``entr`` and a POSIX shell interpreter.
 
 If you are working exclusively on the frontend, you can use ``make frontwatch`` for a slightly better experience. This will not hot-reload the running server and will not bother to watch for changes in Go files.
 
