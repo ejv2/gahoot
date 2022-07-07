@@ -26,7 +26,7 @@ func (c ConnectHost) Perform(game *Game) {
 	cl := Client{
 		Connected: true,
 		conn:      c.Conn,
-		Send:      nil,
+		send:      nil,
 		Ctx:       context.Background(),
 	}
 	verb, _, err := cl.ReadString()
@@ -54,7 +54,7 @@ func (c ConnectHost) Perform(game *Game) {
 			conn:      c.Conn,
 			Ctx:       ctx,
 			Cancel:    cancel,
-			Send:      make(chan string),
+			send:      make(chan string),
 		},
 	}
 
@@ -79,7 +79,7 @@ func (p AddPlayer) Perform(game *Game) {
 		Nick: p.Nick,
 		Client: Client{
 			Connected: false,
-			Send:      make(chan string),
+			send:      make(chan string),
 		},
 	})
 
@@ -113,7 +113,7 @@ func (c ConnectPlayer) Perform(game *Game) {
 	cl := Client{
 		Connected: true,
 		conn:      c.Conn,
-		Send:      nil,
+		send:      nil,
 		Ctx:       context.Background(),
 	}
 	var id uint32
@@ -171,9 +171,7 @@ func (c ConnectPlayer) Perform(game *Game) {
 		Nick string `json:"name"`
 	}{game.state.Players[id-1].ID, game.state.Players[id-1].Nick}
 
-	go func() {
-		game.state.Host.Send <- FormatMessage(CommandNewPlayer, inf)
-	}()
+	game.state.Host.SendMessage(CommandNewPlayer, inf)
 }
 
 // ConnectionUpdate submits a new connection state to the game loop.
@@ -190,16 +188,14 @@ func (c ConnectionUpdate) Perform(game *Game) {
 	// PlayerID is the human-readable ID, so subtract one
 	game.state.Players[c.PlayerID-1].Connected = c.Connected
 
-	go func(id int) {
-		plr := game.state.Players[c.PlayerID-1]
-		dat := PlayerInfo{
-			ID:      plr.ID,
-			Nick:    plr.Nick,
-			Score:   plr.Score,
-			Correct: plr.Correct,
-		}
-		game.state.Host.Send <- FormatMessage(CommandDisconPlayer, dat)
-	}(c.PlayerID - 1)
+	plr := game.state.Players[c.PlayerID-1]
+	dat := PlayerInfo{
+		ID:      plr.ID,
+		Nick:    plr.Nick,
+		Score:   plr.Score,
+		Correct: plr.Correct,
+	}
+	game.state.Host.SendMessage(CommandDisconPlayer, dat)
 }
 
 type KickPlayer struct {
@@ -211,16 +207,14 @@ func (k KickPlayer) Perform(game *Game) {
 	game.state.Players[k.ID-1].Banned = true
 	game.state.Players[k.ID-1].Cancel()
 
-	go func(id int) {
-		plr := game.state.Players[k.ID-1]
-		dat := PlayerInfo{
-			ID:      plr.ID,
-			Nick:    plr.Nick,
-			Score:   plr.Score,
-			Correct: plr.Correct,
-		}
-		game.state.Host.Send <- FormatMessage(CommandRemovePlayer, dat)
-	}(k.ID - 1)
+	plr := game.state.Players[k.ID-1]
+	dat := PlayerInfo{
+		ID:      plr.ID,
+		Nick:    plr.Nick,
+		Score:   plr.Score,
+		Correct: plr.Correct,
+	}
+	game.state.Host.SendMessage(CommandRemovePlayer, dat)
 }
 
 type StartGame struct{}

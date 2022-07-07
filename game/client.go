@@ -64,8 +64,7 @@ type Client struct {
 	Ctx       context.Context
 	Cancel    context.CancelFunc
 
-	Send chan string
-
+	send     chan string
 	conn     *websocket.Conn
 	lastPong time.Time
 }
@@ -75,7 +74,7 @@ func (c Client) writer(interval time.Duration) {
 	defer tick.Stop()
 	for {
 		select {
-		case msg := <-c.Send:
+		case msg := <-c.send:
 			err := c.conn.WriteMessage(websocket.TextMessage, []byte(msg))
 			if err != nil {
 				c.Cancel()
@@ -95,6 +94,21 @@ func (c Client) writer(interval time.Duration) {
 			return
 		}
 	}
+}
+
+// Send transmits a message to the client through the websocket connection,
+// blocking either until the message has sent or the connection terminates.
+// This call CANNOT block forever.
+func (c Client) Send(msg string) {
+	select {
+	case c.send <- msg:
+	case <-c.Ctx.Done():
+	}
+}
+
+// SendMessage formats a message using FormatMessage and sends to the client.
+func (c Client) SendMessage(verb string, body interface{}) {
+	c.Send(FormatMessage(verb, body))
 }
 
 // Open sets up the websocket connection for reading as a client. Among other
@@ -165,7 +179,7 @@ func (c Client) Read(buf []byte) (int, error) {
 // method may ONLY be called after Open() and always returns successfully. An
 // unsuccessful call will close the websocket connection.
 func (c Client) Write(msg []byte) (int, error) {
-	c.Send <- string(msg)
+	c.Send(string(msg))
 	return len(msg), nil
 }
 
