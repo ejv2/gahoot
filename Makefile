@@ -1,5 +1,6 @@
 # Gahoot - Distributed, FOSS rewrite of Kahoot! in GO
 # Copyright 2022 - Ethan Marshall
+.POSIX:
 
 SRV_SRC = main.go front.go play.go api.go ver.go \
 	  config/conf.go config/parse.go \
