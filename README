@@ -6,9 +6,9 @@ Gahoot! is a distributed and self-hostable rewrite of [Kahoot!](https://kahoot.c
 
 ## Design goals
 
-* To provide an experience as close to mainline Kahoot! as I can manage (see exceptions below)
-* To allow anybody to set up an instance and anybody to play on any instance
-* To provide a minimal, high-performance version of the game which can function on almost any device
+* To allow anybody to set up a lightweight instance and anybody to play on any instance they choose. You can spin up a server to play with friends on or for a presentation or for a class.
+* To provide a minimal, high-performance version of the game which can function on almost any device. This includes both the client and server. You should be able to spin up an instance on your laptop with your work team or in school; or host one persistently on your Raspberry Pi.
+* To encourage a distributed model of play, in which there are many different game servers on which many different hosts and players reside. There is no need for a central setup of Gahoot, although some servers may be come more popular than others.
 
 ## Design document
 
