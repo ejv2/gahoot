@@ -82,10 +82,17 @@ func handleJoin(c *gin.Context) {
 	joinPin()
 }
 
+// handleCreate is the handler for "/create/"
+//
+// Shows a page of links to different methods of creating a game.
 func handleCreate(c *gin.Context) {
 	c.HTML(200, "create.gohtml", nil)
 }
 
+// handleFind is the handler for "/create/find"
+//
+// Shows a page which allows the user to find already uploaded or shared games
+// on this game server, sorted by category and upload source.
 func handleFind(c *gin.Context) {
 	dat := struct {
 		Quizzes    []quiz.Quiz
@@ -98,6 +105,10 @@ func handleFind(c *gin.Context) {
 	c.HTML(200, "create_find.gohtml", dat)
 }
 
+// handleUpload is the GET handler for "/create/upload"
+//
+// Shows an upload form which allows the user to submit a quiz archive to this
+// server for use in memory.
 func handleUpload(c *gin.Context) {
 	dat := struct {
 		// Maximum file size in MB
@@ -109,10 +120,18 @@ func handleUpload(c *gin.Context) {
 	c.HTML(200, "create_upload.gohtml", dat)
 }
 
+// handleEditor is the handler for "/create/new"
+//
+// Shows the client-side quiz editor that allows a quiz to be both downloaded
+// and saved and played in-memory on this game server.
 func handleEditor(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
+// handleCreateGame is the handler for "/create/game/{HASH}"
+//
+// Creates and stores a new game based on the stored hash from the game manager.
+// If the hash is not found, redirects back to "/new/find".
 func handleCreateGame(c *gin.Context) {
 	hash := c.Param("hash")
 	if hash == "" {
@@ -132,6 +151,9 @@ func handleCreateGame(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/play/host/"+g.PIN.String())
 }
 
+// handleBlankCreateGame is the handler for "/create/game")
+//
+// Redirects confused visitors back to where they probably want to be.
 func handleBlankCreateGame(c *gin.Context) {
 	c.Redirect(http.StatusMovedPermanently, "/create/")
 }
