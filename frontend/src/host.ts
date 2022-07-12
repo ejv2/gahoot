@@ -53,6 +53,12 @@ class HostState {
 
     connected: boolean
 
+    countdownTitle: string
+    countdownFull: boolean
+    countdownCount: number
+    private countdownHndl: number
+
+
     players: Player[]
     startError: boolean
 
@@ -66,6 +72,11 @@ class HostState {
         this.title = title
         this.players = []
         this.startError = false
+
+        this.countdownTitle = ""
+        this.countdownFull = false
+        this.countdownCount = 10
+        this.countdownHndl = 0
 
         this.state = this.stateWaitingJoin
         this.stateID = States.JoinWaiting
@@ -169,9 +180,7 @@ class HostState {
     // message received signalling countdown ended
     stateStartCountdown(ev: common.GameMessage): common.GameState<HostState> {
         if (ev.action != "sack") {
-            if (ev.action != "plr") {
-                console.warn("unexpected message: "+ev.action)
-            }
+            console.warn("unexpected message: "+ev.action)
             return this.state
         }
 
@@ -186,10 +195,12 @@ class HostState {
     // FRONTEND FUNCTIONS
     // ------------------
 
-    // Send the primary start message
+    // Send the primary start message and schedule the secondary
     //
-    // Instructs the game server that the countdown has ended and the game must
-    // start
+    // Tells the game server to start countdowns on other client screens,
+    // as well as waiting for the next instruction. Schedules the
+    // secondary start message, which instantly shifts us to the first
+    // question's countdown.
     startGame(): void {
         // Minimum three players require before starting
         if (this.players.length < 3) {
@@ -199,13 +210,36 @@ class HostState {
         }
 
         this.stateID = States.StartCountdown
-        common.SendMessage(conn, "count", {
-            time: 10,
-        })
-        setTimeout(() => {
-            common.SendMessage(conn, "start", {})
-        }, 10*1000)
+        common.SendMessage(conn, "count", 10)
+        let startmsg = <common.GameMessage>{
+            action: "start",
+            data: {}
+        }
+        // setTimeout(() => {
+        //     common.SendMessage(conn, "start", {})
+        // }, 10*1000)
+        this.startCountdown(10, startmsg, this.title)
         this.state = this.stateStartCountdown
+    }
+
+    startCountdown(length: number, msg: common.GameMessage, title?: string) {
+        if (length == 0) {
+            return this.state
+        }
+        if (title) {
+            this.countdownFull = true
+            this.countdownTitle = title
+        }
+        this.countdownCount = length
+
+        this.countdownHndl = window.setInterval(() => {
+            this.countdownCount--;
+            console.log(this.countdownCount)
+            if (this.countdownCount <= 0) {
+                common.SendMessage(conn, msg.action, msg.data)
+                clearInterval(this.countdownHndl)
+            }
+        }, 1000)
     }
 
     // Request the server to kick a player

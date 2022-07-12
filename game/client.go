@@ -16,10 +16,12 @@ import (
 // are variadic and separated by whitespace. The "<verb>" can be any of these
 // constants.
 const (
-	CommandNewQuestion  = "ques"
-	CommandAnswerAck    = "ansack"
-	CommandQuestionOver = "qend"
-	CommandSeeResults   = "res"
+	CommandGameCount     = "gcount"
+	CommandQuestionCount = "count"
+	CommandNewQuestion   = "ques"
+	CommandAnswerAck     = "ansack"
+	CommandQuestionOver  = "qend"
+	CommandSeeResults    = "res"
 
 	CommandNewPlayer    = "plr"
 	CommandRemovePlayer = "rmplr"
@@ -36,6 +38,7 @@ const (
 	MessageAnswer      = "ans"
 
 	MessageKick      = "kick"
+	MessageCountdown = "count"
 	MessageStartGame = "start"
 )
 

@@ -110,27 +110,35 @@ func (game *Game) WaitForHost() StateFunc {
 	game.state.Status = GameHostWaiting
 
 	if game.state.Host != nil {
-		return game.WaitForPlayers
+		game.state.Status = GameWaiting
+		return game.Sustain
 	}
 	return game.WaitForHost
 }
 
-// WaitForPlayers is the state while we are waiting on the host to start
-// the game.
-func (game *Game) WaitForPlayers() StateFunc {
-	game.state.Status = GameWaiting
-	return game.WaitForPlayers
-}
+func (game *Game) AcceptAnswers() StateFunc {
+	game.state.acceptingAnswers = true
+	if game.state.gotAnswers >= game.state.wantAnswers {
+		game.state.acceptingAnswers = false
+		return game.Sustain
+	}
 
-// GameStarting is the state while we are showing the game start screen
-// and title countdown.
-func (game *Game) GameStarting() StateFunc {
-	game.state.Status = GameRunning
-	return game.GameStarting
+	return game.AcceptAnswers
 }
 
 // GameEnding is the state while we are showing the game end screen and
-// results summary, after which the game runner can shut down.
+// results summary, after which the game runner can shut down. It accepts
+// one more message, which is the host communicating that it is finished.
 func (game *Game) GameEnding() StateFunc {
 	return nil
+}
+
+// GameTerminate terminates the game loop on next iteration.
+func (game *Game) GameTerminate() StateFunc {
+	return nil
+}
+
+// Sustain keeps the game in the current state.
+func (game *Game) Sustain() StateFunc {
+	return game.sf
 }

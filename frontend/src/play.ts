@@ -23,8 +23,8 @@ enum States {
 }
 
 interface CountdownData {
-    length: number,
-    title: string,
+    count: number
+    title: string
 }
 
 interface QuestionData {
@@ -60,9 +60,8 @@ class PlayerState {
     points: number
     rank: number
 
-    countdown: CountdownData
-    countdownCount: number
     private countdownHndl: number
+    countdown: number | string
 
     question: QuestionData
     feedback: FeedbackData
@@ -79,12 +78,8 @@ class PlayerState {
         this.pin = game
         this.uid = user
 
-        this.countdown = {
-            title: "",
-            length: 5,
-        }
-        this.countdownCount = this.countdown.length
         this.countdownHndl = 0
+        this.countdown = 0
 
         this.question = {
             title: "Error!",
@@ -153,37 +148,32 @@ class PlayerState {
         this.state = this.state(msg)
     }
 
-    startCountdown(ev: common.GameMessage) {
-        this.countdown = <CountdownData>ev.data;
-        if (this.countdown.length == 0) {
-            return this.state
-        }
-
-        this.countdownHndl = window.setInterval(() => {
-            this.countdownCount--;
-            if (this.countdownCount == 0) {
-                clearInterval(this.countdownHndl)
-                common.SendMessage(conn, "ack", {})
-
-                this.state = this.stateQuestion
-            }
-        }, 1000)
-    }
 
     // STATE FUNCTIONS
     // ---------------
 
     // Waiting for game to start
     stateWaiting(ev: common.GameMessage): common.GameState<PlayerState> {
-        if (ev.action != "starting") {
+        if (ev.action == "ques") {
+            this.stateID = States.Question
+            return this.stateQuestion
+        }
+        if (ev.action != "gcount") {
             console.warn("Expected starting message, got " + ev.action)
             return this.stateWaiting
         }
 
-        this.stateID = States.Countdown
-        this.startCountdown(ev)
+        let data = <CountdownData>ev.data
+        this.startCountdown(data.count)
+        return this.stateGameCountdown
+    }
 
-        return this.stateQuestion
+    stateGameCountdown(ev: common.GameMessage): common.GameState<PlayerState> {
+        if (ev.action == "ques") {
+            return this.stateQuestion
+        }
+
+        return this.state
     }
 
     // Show the question on screen
@@ -236,6 +226,23 @@ class PlayerState {
     // Any further messages are ignored, including closes
     stateEnding(ev: common.GameMessage): common.GameState<PlayerState> {
         return this.stateEnding
+    }
+
+    private startCountdown(len: number, title?: string): void {
+        this.stateID = States.Countdown
+        if (title) {
+            this.countdown = title
+            return
+        }
+
+        this.countdown = len
+        this.countdownHndl = window.setInterval(() => {
+            if (this.countdown <= 0) {
+                window.clearInterval(this.countdownHndl)
+                return
+            }
+            (<number>this.countdown)--
+        }, 1000)
     }
 }
 

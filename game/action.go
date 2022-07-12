@@ -229,14 +229,80 @@ func (k KickPlayer) Perform(game *Game) {
 	game.state.Host.SendMessage(CommandRemovePlayer, dat)
 }
 
-type StartGame struct{}
+// StartGame either begins a game or game countdown.
+// If Count is > 0, the countdown state is activated. Else the game is
+// immediately started.
+type StartGame struct {
+	Count int
+}
 
 func (s StartGame) Perform(game *Game) {
-	if len(game.state.Players) < MinPlayers {
-		log.Println(game.PIN, "attempted to start with", len(game.state.Players), "(too few; rejected)")
+	if s.Count <= 0 {
+		if len(game.state.Players) < MinPlayers {
+			log.Println(game.PIN, "attempted to start with", len(game.state.Players), "(too few; rejected)")
+		}
+		game.sf = game.Sustain
+
+		game.state.Host.SendMessage(CommandStartAck, struct{}{})
+
+		log.Println(game.PIN, "now commencing")
+		return
 	}
-	game.sf = game.GameStarting
-	log.Println(game.PIN, "now commencing")
+
+	game.sf = game.Sustain
+	for _, plr := range game.state.Players {
+		go func(plr Player) {
+			plr.SendMessage(CommandGameCount, struct {
+				Count int    `json:"count"`
+				Title string `json:"title"`
+			}{s.Count, game.Title})
+		}(plr)
+	}
+
+	game.sf = game.Sustain
+	log.Println(game.PIN, "countdown started")
+}
+
+type StartQuestion struct {
+	Counting bool
+}
+
+func (s StartQuestion) Perform(game *Game) {
+	if !s.Counting {
+		for i := range game.state.Players {
+			game.state.Players[i].answer = 0
+		}
+
+		game.state.acceptingAnswers = true
+		game.state.gotAnswers, game.state.wantAnswers = 0, len(game.state.Players)
+
+		game.sf = game.AcceptAnswers
+		return
+	}
+
+	game.sf = game.Sustain
+}
+
+type Answer struct {
+	PlayerID, Number int
+}
+
+func (a Answer) Perform(game *Game) {
+	if a.Number < 1 {
+		panic("answer: invalid answer: less than 1")
+	}
+	if !game.state.acceptingAnswers {
+		return
+	}
+	if a.PlayerID <= 0 || a.PlayerID > len(game.state.Players) {
+		return
+	}
+	if game.state.Players[a.PlayerID-1].answer > 0 {
+		return
+	}
+
+	game.state.gotAnswers++
+	game.state.Players[a.PlayerID-1].answer = a.Number
 }
 
 // EndGame shuts down the game runner, thereby terminating the current
@@ -253,9 +319,11 @@ type EndGame struct {
 }
 
 func (e EndGame) Perform(game *Game) {
-	game.sf = game.GameEnding
-
 	if !e.Clean {
 		game.cancel()
+		game.sf = game.GameTerminate
+		return
 	}
+
+	game.sf = game.GameEnding
 }

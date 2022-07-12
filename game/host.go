@@ -33,6 +33,13 @@ readloop:
 		}
 
 		switch cmd {
+		case MessageCountdown:
+			time, err := strconv.ParseInt(data, 10, 32)
+			if err != nil {
+				log.Println("invalid countdown timer:", data)
+				break
+			}
+			ev <- StartGame{int(time)}
 		case MessageStartGame:
 			ev <- StartGame{}
 		case MessageKick:
