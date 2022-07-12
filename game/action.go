@@ -11,7 +11,8 @@ import (
 // A Action is some action which can be sent to the game runner goroutine
 // to perform an action on live game data, synchronised with the rest of the
 // game. As these run on the runner thread, there is no need for any kind of
-// locking.
+// locking. The only condition is that these actions MUST NEVER set game.sf to
+// nil. Use game.GameEnding instead.
 type Action interface {
 	Perform(game *Game)
 }
@@ -210,6 +211,9 @@ func (c ConnectionUpdate) Perform(game *Game) {
 	game.state.Host.SendMessage(CommandDisconPlayer, dat)
 }
 
+// KickPlayer disconnects and bans a player ID from this game.
+// This means the player will be disconnected and will be prevented from
+// rejoining.
 type KickPlayer struct {
 	ID int
 }
