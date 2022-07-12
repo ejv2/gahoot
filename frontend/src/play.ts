@@ -195,6 +195,8 @@ class PlayerState {
             return this.state
         }
 
+        // TODO: Randomize extremely annoying message here
+        this.startCountdown(-1, "Were you too fast?")
         return this.stateFeedback
     }
 
@@ -213,12 +215,10 @@ class PlayerState {
             return this.stateEnding
             default:
                 console.warn("Expecting results/feedback, got " + ev.action)
-            return this.state
+                return this.state
         }
 
         this.stateID = States.Answer
-
-        this.startCountdown(ev)
         return this.stateQuestion
     }
 

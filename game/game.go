@@ -43,6 +43,9 @@ type State struct {
 	Status  Status
 	Host    *Host
 	Players []Player
+
+	acceptingAnswers        bool
+	wantAnswers, gotAnswers int
 }
 
 // Game is a single instance of a running game.
