@@ -40,6 +40,7 @@ type Answer struct {
 // response.
 type Question struct {
 	Title    string   `json:"title"`
+	Duration int      `json:"time"`
 	ImageURL *url.URL `json:"image_url"`
 	Answers  []Answer `json:"answers"`
 }
