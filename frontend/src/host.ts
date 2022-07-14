@@ -34,6 +34,13 @@ interface PlayerData {
     correct: number
 }
 
+interface QuestionData {
+    title: string
+    image?: string
+    time: number
+    answers: string[]
+}
+
 interface Player extends PlayerData {
     connected: boolean
     loading: boolean
@@ -58,9 +65,12 @@ class HostState {
     countdownCount: number
     private countdownHndl: number
 
-
     players: Player[]
     startError: boolean
+
+    question: QuestionData
+    gotAnswers: number
+    questionCountdown: number
 
     // Initializes data defaults
     //
@@ -77,6 +87,15 @@ class HostState {
         this.countdownFull = false
         this.countdownCount = 10
         this.countdownHndl = 0
+
+        this.question = {
+            title: "",
+            image: undefined,
+            time: 10,
+            answers: [],
+        }
+        this.gotAnswers = 0
+        this.questionCountdown = this.question.time
 
         this.state = this.stateWaitingJoin
         this.stateID = States.JoinWaiting
@@ -215,13 +234,13 @@ class HostState {
             action: "start",
             data: {}
         }
-        // setTimeout(() => {
-        //     common.SendMessage(conn, "start", {})
-        // }, 10*1000)
         this.startCountdown(10, startmsg, this.title)
         this.state = this.stateStartCountdown
     }
 
+    // Start the visual countdown on screen.
+    // If title is provided, the countdown is a "full" countdown, showing
+    // an image etc.
     startCountdown(length: number, msg: common.GameMessage, title?: string) {
         if (length == 0) {
             return this.state

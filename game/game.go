@@ -43,7 +43,9 @@ type State struct {
 	Status  Status
 	Host    *Host
 	Players []Player
+	CurrentQuestion int
 
+	countdownDone           bool
 	acceptingAnswers        bool
 	wantAnswers, gotAnswers int
 }
@@ -119,6 +121,29 @@ func (game *Game) WaitForHost() StateFunc {
 	return game.WaitForHost
 }
 
+// Question is active when the game is showing a question but BEFORE we
+// are accepting answers. At the point where the countdown is finished, a
+// snapshot of the current player state is taken such that new players do
+// not disrupt the existing players' game.
+func (game *Game) Question() StateFunc {
+	if game.state.countdownDone {
+		game.state.acceptingAnswers = true
+		game.state.gotAnswers, game.state.wantAnswers = 0, len(game.state.Players)
+		return game.AcceptAnswers
+	}
+
+	q := game.Questions[game.state.CurrentQuestion]
+	go game.state.Host.SendMessage(CommandNewQuestion, q)
+
+	for _, plr := range game.state.Players {
+		go plr.SendMessage(CommandQuestionCount, struct{}{})
+	}
+
+	return game.sf
+}
+
+// AcceptAnswers is active when the game is idle accepting answers until
+// every player has answered.
 func (game *Game) AcceptAnswers() StateFunc {
 	game.state.acceptingAnswers = true
 	if game.state.gotAnswers >= game.state.wantAnswers {

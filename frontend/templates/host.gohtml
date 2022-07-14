@@ -28,7 +28,9 @@
 		</div>
 
 		<!-- Game start countdown -->
-		<div id="start-countdown" x-show="stateID == 2">
+		<div id="start-countdown" x-show="stateID == 2" class="game-container">
+			<p x-text="countdownTitle" />
+			<p x-text="countdownCount" />
 		</div>
 	</body>
 

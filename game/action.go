@@ -245,8 +245,10 @@ func (s StartGame) Perform(game *Game) {
 		if len(game.state.Players) < MinPlayers {
 			log.Println(game.PIN, "attempted to start with", len(game.state.Players), "(too few; rejected)")
 		}
-		game.sf = game.Sustain
 
+		// NOTE: calling func here, as shift must be immediate
+		game.sf = game.Question()
+		game.state.Status = GameRunning
 		game.state.Host.SendMessage(CommandStartAck, struct{}{})
 
 		log.Println(game.PIN, "now commencing")
@@ -267,24 +269,11 @@ func (s StartGame) Perform(game *Game) {
 	log.Println(game.PIN, "countdown started")
 }
 
-type StartQuestion struct {
-	Counting bool
-}
+type NextQuestion struct{}
 
-func (s StartQuestion) Perform(game *Game) {
-	if !s.Counting {
-		for i := range game.state.Players {
-			game.state.Players[i].answer = 0
-		}
-
-		game.state.acceptingAnswers = true
-		game.state.gotAnswers, game.state.wantAnswers = 0, len(game.state.Players)
-
-		game.sf = game.AcceptAnswers
-		return
-	}
-
-	game.sf = game.Sustain
+func (n NextQuestion) Perform(game *Game) {
+	game.sf = game.Question
+	game.state.CurrentQuestion++
 }
 
 type Answer struct {

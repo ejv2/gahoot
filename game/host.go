@@ -48,6 +48,8 @@ readloop:
 				break
 			}
 			ev <- KickPlayer{int(id)}
+		case MessageNextQuestion:
+			ev <- NextQuestion{}
 		}
 
 		select {

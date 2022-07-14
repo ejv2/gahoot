@@ -37,9 +37,10 @@ const (
 	MessageAcknowledge = "ack"
 	MessageAnswer      = "ans"
 
-	MessageKick      = "kick"
-	MessageCountdown = "count"
-	MessageStartGame = "start"
+	MessageKick         = "kick"
+	MessageCountdown    = "count"
+	MessageStartGame    = "start"
+	MessageNextQuestion = "next"
 )
 
 // Client mechanism constants.
