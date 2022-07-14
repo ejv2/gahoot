@@ -27,7 +27,7 @@ var QuizTests = []Quiz{
 		Category:    "technology",
 		Created:     time.Now(),
 		Questions: []Question{
-			{"First question", nil,
+			{"First question", 10, nil,
 				[]Answer{
 					{"1", false},
 				}},
