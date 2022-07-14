@@ -156,7 +156,11 @@ func (m *Manager) Get(h hash.Hash) (Quiz, bool) {
 	m.mut.RLock()
 	defer m.mut.RUnlock()
 
-	q, ok := m.qs[fmt.Sprintf("%X", h.Sum(nil))]
+	tmp := Quiz{
+		hash: h,
+	}
+
+	q, ok := m.qs[tmp.String()]
 	return q, ok
 }
 
