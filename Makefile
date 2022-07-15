@@ -26,15 +26,13 @@ ${EXE}: ${SRV_SRC}
 
 ${TSC_OUT}: ${TSC_SRC} ${TSC_DEP}
 	cd frontend && npm run build
+	./scripts/pack
 
 ${TSC_DEP}:
 	cd frontend && npm install
 
 watch:
 	./scripts/watch
-
-frontwatch:
-	cd frontend && npm run watch
 
 clean:
 	rm -f ${EXE}

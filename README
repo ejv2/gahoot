@@ -24,9 +24,9 @@ If the above doesn't work for you or if you are really having trouble compiling 
 
 Simply run ``make`` in the root. If you do not have ``tsc`` installed on your system, the Makefile will automatically run ``npm install`` for you to counteract your forgetfulness/laziness. You're welcome.
 
-If you are actively developing the program, run ``make watch`` and the server will be reloaded when there is a change to any source code (that includes restarting the server). This requires the BSD utility ``entr`` and a POSIX shell interpreter.
+If you are actively developing the program, run ``make watch`` and the server will be reloaded when there is a change to any source code (that includes restarting the server). This requires the BSD utility ``entr``, as well as a POSIX shell interpreter.
 
-If you are working exclusively on the frontend, you can use ``make frontwatch`` for a slightly better experience. This will not hot-reload the running server and will not bother to watch for changes in Go files.
+> **Note:** You will need to be on a system which supports a POSIX shell in order to build, as the build process relies on running shell scripts. If on Windows, please consider using WSL (sorry!).
 
 ## Contributions
 

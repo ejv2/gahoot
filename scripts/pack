@@ -1,0 +1,33 @@
+#!/bin/sh
+# Pack - Package JavaScript dependencies
+#
+# Copies all CJS and Node modules to a static site directory and rewrites
+# imports
+
+[ -d frontend/src/ ] || echo "frontend not found; run from project root"; exit 1
+mkdir -p frontend/static/js/libs/
+
+for f in $(find frontend/src/ -type f -name "*.ts")
+do
+	# Copy dependencies
+	compiled=$(echo "$f" | sed -E 's/frontend\/src\/(.*)\.ts/frontend\/.genjs\/\1.js/')
+	[ -f "$compiled" ] || continue
+	imp=$(grep -Eo "from (['\"])?\w+(['\"])?;?$" "$f" | tr -d ";'\"" | sed 's/from\s//')
+	for i in $imp
+	do
+		mod="frontend/node_modules/$i"
+		main=$(grep -Eo '"module":\s+".+"' "$mod/package.json" | sed -E 's/"module":\s+"(.+)"/\1/')
+		cp "$mod/$main" "frontend/static/js/libs/$i.js"
+	done
+
+	# Copy files and rewrite imports
+	cp frontend/.genjs/*.js frontend/.genjs/*.js.map frontend/static/js
+	for f in $(find frontend/static/js -name "libs" -prune -or -name "*.js" -print)
+	do
+		tmp="$(basename "$f").tmp"
+		sed -E "s/from (['\"])?(\w+)(['\"])?;?$/from \".\/libs\/\2.js\"/ ;
+			s/from (['\"])?(.\/\w+)(['\"])?;?$/from \"\2.js\"/" "$f" > "$tmp"
+		rm "$f"
+		mv "$tmp" "$f"
+	done
+done
