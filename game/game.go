@@ -40,9 +40,9 @@ type StateFunc func() StateFunc
 // state to other objects, as well as to separate methods which act on the game
 // itself and its state.
 type State struct {
-	Status  Status
-	Host    *Host
-	Players []Player
+	Status          Status
+	Host            *Host
+	Players         []Player
 	CurrentQuestion int
 
 	countdownDone           bool
