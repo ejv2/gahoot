@@ -22,12 +22,12 @@ do
 
 	# Copy files and rewrite imports
 	cp frontend/.genjs/*.js frontend/.genjs/*.js.map frontend/static/js
-	for f in $(find frontend/static/js -name "libs" -prune -or -name "*.js" -print)
+	for src in $(find frontend/static/js -name "libs" -prune -or -name "*.js" -print)
 	do
-		tmp="$(basename "$f").tmp"
+		tmp="$(basename "$src").tmp"
 		sed -E "s/from (['\"])?(\w+)(['\"])?;?$/from \".\/libs\/\2.js\"/ ;
-			s/from (['\"])?(.\/\w+)(['\"])?;?$/from \"\2.js\"/" "$f" > "$tmp"
-		rm "$f"
-		mv "$tmp" "$f"
+			s/from (['\"])?(.\/\w+)(['\"])?;?$/from \"\2.js\"/" "$src" > "$tmp"
+		rm "$src"
+		mv "$tmp" "$src"
 	done
 done
