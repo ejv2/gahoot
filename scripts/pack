@@ -19,15 +19,15 @@ do
 		main=$(grep -Eo '"module":\s+".+"' "$mod/package.json" | sed -E 's/"module":\s+"(.+)"/\1/')
 		cp "$mod/$main" "frontend/static/js/libs/$i.js"
 	done
+done
 
-	# Copy files and rewrite imports
-	cp frontend/.genjs/*.js frontend/.genjs/*.js.map frontend/static/js
-	for src in $(find frontend/static/js -name "libs" -prune -or -name "*.js" -print)
-	do
-		tmp="$(basename "$src").tmp"
-		sed -E "s/from (['\"])?(\w+)(['\"])?;?$/from \".\/libs\/\2.js\"/ ;
-			s/from (['\"])?(.\/\w+)(['\"])?;?$/from \"\2.js\"/" "$src" > "$tmp"
-		rm "$src"
-		mv "$tmp" "$src"
-	done
+# Copy files and rewrite imports
+cp frontend/.genjs/*.js frontend/.genjs/*.js.map frontend/static/js
+for src in $(find frontend/static/js -name "libs" -prune -or -name "*.js" -print)
+do
+	tmp="$(basename "$src").tmp"
+	sed -E "s/from (['\"])?(\w+)(['\"])?;?$/from \".\/libs\/\2.js\"/ ;
+		s/from (['\"])?(.\/\w+)(['\"])?;?$/from \"\2.js\"/" "$src" > "$tmp"
+	rm "$src"
+	mv "$tmp" "$src"
 done
