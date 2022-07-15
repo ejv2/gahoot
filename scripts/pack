@@ -4,7 +4,7 @@
 # Copies all CJS and Node modules to a static site directory and rewrites
 # imports
 
-[ -d frontend/src/ ] || echo "frontend not found; run from project root"; exit 1
+[ -d frontend/src/ ] || exit 1
 mkdir -p frontend/static/js/libs/
 
 for f in $(find frontend/src/ -type f -name "*.ts")
