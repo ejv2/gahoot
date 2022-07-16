@@ -12,9 +12,11 @@ import (
 )
 
 // WebSocket server message commands.
-// Each websocket message is formatted as "<verb> <arg0>...<arg n>", where args
-// are variadic and separated by whitespace. The "<verb>" can be any of these
-// constants.
+// Each websocket message is formatted as "<verb> <body>", where body
+// is any valid JSON value, including literals (raw numbers or string literals)
+// or composites (arrays and objects). This allows arbitrary Go data to be
+// passed to the client. The client expects each field in the passed data to be
+// lower case.
 const (
 	CommandGameCount     = "gcount"
 	CommandQuestionCount = "count"
