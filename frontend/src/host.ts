@@ -89,10 +89,12 @@ class HostState {
         this.countdownHndl = 0
 
         this.question = {
-            title: "",
-            image: undefined,
+            title: "Error!",
+            image: "https://developer.valvesoftware.com/w/images/5/5b/Missing_textures_example.png",
             time: 10,
-            answers: [],
+            answers: ["1", "2", "3", "4"],
+            index: 1,
+            total: 10,
         }
         this.gotAnswers = 0
         this.questionCountdown = this.question.time
