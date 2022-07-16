@@ -29,6 +29,8 @@ const (
 	CommandRemovePlayer = "rmplr"
 	CommandDisconPlayer = "dcplr"
 	CommandStartAck     = "sack"
+	CommandQuestionAck  = "quack"
+	CommandNewAnswer    = "nans"
 )
 
 // WebSocket client message commands.
@@ -43,6 +45,8 @@ const (
 	MessageCountdown    = "count"
 	MessageStartGame    = "start"
 	MessageNextQuestion = "next"
+	MessageAnswerNow    = "sans"
+	MessageTimeUp       = "time"
 )
 
 // Client mechanism constants.

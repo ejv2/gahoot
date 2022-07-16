@@ -132,11 +132,21 @@ func (game *Game) Question() StateFunc {
 		return game.AcceptAnswers
 	}
 
-	q := game.Questions[game.state.CurrentQuestion]
+	q := struct {
+		quiz.Question
+		Index int `json:"index"`
+		Total int `json:"total"`
+	}{
+		game.Questions[game.state.CurrentQuestion],
+		game.state.CurrentQuestion + 1,
+		len(game.Questions),
+	}
 	go game.state.Host.SendMessage(CommandNewQuestion, q)
 
 	for _, plr := range game.state.Players {
-		go plr.SendMessage(CommandQuestionCount, struct{}{})
+		go plr.SendMessage(CommandQuestionCount, struct {
+			Count int `json:"count"`
+		}{10})
 	}
 
 	return game.sf

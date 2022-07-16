@@ -32,6 +32,13 @@
 			<p x-text="countdownTitle" />
 			<p x-text="countdownCount" />
 		</div>
+
+		<!-- Question start countdown -->
+		<div id="start-countdown" x-show="stateID == 3" class="game-container">
+			<p x-text="countdownTitle" />
+			<div><span x-text="$store.host.question.index"></span> / <span x-text="$store.host.question.total"></span></div>
+			<p x-text="countdownCount" />
+		</div>
 	</body>
 
 </html>

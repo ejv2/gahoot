@@ -8,8 +8,6 @@
 import * as common from "./common"
 import Alpine from "alpinejs"
 
-// Gameplay constants
-
 // Page lifetime variables
 let conn: WebSocket
 let host: HostState
@@ -39,6 +37,9 @@ interface QuestionData {
     image?: string
     time: number
     answers: string[]
+
+    index: number
+    total: number
 }
 
 interface Player extends PlayerData {
@@ -71,6 +72,7 @@ class HostState {
     question: QuestionData
     gotAnswers: number
     questionCountdown: number
+    private questionCountdownHndl: number
 
     // Initializes data defaults
     //
@@ -98,6 +100,7 @@ class HostState {
         }
         this.gotAnswers = 0
         this.questionCountdown = this.question.time
+        this.questionCountdownHndl = 0
 
         this.state = this.stateWaitingJoin
         this.stateID = States.JoinWaiting
@@ -208,8 +211,49 @@ class HostState {
         return this.stateQuestionCountdown
     }
 
+    // question countdown begins
     stateQuestionCountdown(ev: common.GameMessage): common.GameState<HostState> {
+        if (ev.action != "ques") {
+            console.warn("expected question, got "+ev.action)
+            return this.state
+        }
+
         this.stateID = States.QuestionCountdown
+        this.question = <QuestionData>ev.data
+        this.startCountdown(10, {
+            action: "sans",
+            data: {},
+        }, this.question.title)
+        return this.stateQuestion
+    }
+
+    // question countdown ended; waiting for submissions
+    stateQuestion(ev: common.GameMessage): common.GameState<HostState> {
+        this.questionCountdown = this.question.time
+        this.questionCountdownHndl = window.setInterval(() => {
+            if (this.questionCountdown-- <= 0) {
+                window.clearInterval(this.questionCountdownHndl)
+                common.SendMessage(conn, "time", {})
+            }
+        }, 1000)
+
+        switch (ev.action) {
+            case "quack":
+                this.stateID = States.QuestionAsk
+                return this.state
+            case "nans":
+                this.gotAnswers++;
+                return this.state
+            case "qend":
+                this.stateID = States.QuestionAnswer
+                return this.stateFeedback
+            default:
+                console.warn("expected question acknowledge, got "+ev.action)
+                return this.state
+        }
+    }
+
+    stateFeedback(ev: common.GameMessage): common.GameState<HostState> {
         return this.state
     }
 
@@ -255,7 +299,6 @@ class HostState {
 
         this.countdownHndl = window.setInterval(() => {
             this.countdownCount--;
-            console.log(this.countdownCount)
             if (this.countdownCount <= 0) {
                 common.SendMessage(conn, msg.action, msg.data)
                 clearInterval(this.countdownHndl)

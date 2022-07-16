@@ -40,14 +40,14 @@ readloop:
 				break
 			}
 			ev <- StartGame{int(time)}
-		case MessageStartGame:
-			ev <- StartGame{}
 		case MessageKick:
 			id, err := strconv.ParseInt(data, 10, 32)
 			if err != nil {
 				break
 			}
 			ev <- KickPlayer{int(id)}
+		case MessageStartGame:
+			ev <- StartGame{}
 		case MessageNextQuestion:
 			ev <- NextQuestion{}
 		}

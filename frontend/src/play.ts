@@ -18,6 +18,7 @@ enum States {
     Waiting,
     Countdown,
     Question,
+    Pending,
     Answer,
     Finished
 }
@@ -169,15 +170,19 @@ class PlayerState {
     }
 
     stateGameCountdown(ev: common.GameMessage): common.GameState<PlayerState> {
-        if (ev.action == "ques") {
+        if (ev.action == "count") {
+            let data = <CountdownData>ev.data
+
+            this.stateID = States.Countdown
+            this.startCountdown(data.count)
             return this.stateQuestion
         }
 
         return this.state
     }
 
-    // Show the question on screen
-    stateQuestion(ev: common.GameMessage): common.GameState<PlayerState> {
+    // Count down for the question to start
+    stateQuestionCountdown(ev: common.GameMessage): common.GameState<PlayerState> {
         if (ev.action != "ques") {
             console.warn("Expecting question, got " + ev.action)
             return this.state
@@ -185,18 +190,33 @@ class PlayerState {
 
         this.stateID = States.Question
         this.question = <QuestionData>ev.data
-        return this.stateFeedback
+        return this.stateQuestion
+    }
+
+    // Show the question on screen
+    stateQuestion(ev: common.GameMessage): common.GameState<PlayerState> {
+        switch (ev.action) {
+            case "ansack":
+                this.stateID = States.Pending
+                // TODO: Randomize extremely annoying message here
+                this.startCountdown(-1, "Were you too fast?")
+                return this.stateWaitingFeedback
+            case "qend":
+                this.stateID = States.Answer
+                return this.stateFeedback
+            default:
+                console.warn("Unexpected message "+ev.action)
+                return this.state
+        }
     }
 
     // "Classroom genius?"
     stateWaitingFeedback(ev: common.GameMessage): common.GameState<PlayerState> {
-        if (ev.action != "ansack") {
-            console.warn("Expecting answer acknowledge, got " + ev.action)
+        if (ev.action != "qend") {
+            console.warn("Expecting question end, got " + ev.action)
             return this.state
         }
 
-        // TODO: Randomize extremely annoying message here
-        this.startCountdown(-1, "Were you too fast?")
         return this.stateFeedback
     }
 
@@ -208,18 +228,18 @@ class PlayerState {
         this.rank = this.feedback.placement
 
         switch (ev.action) {
-            case "quend":
-                break
+            case "count":
+                let data = <CountdownData>ev.data
+                this.stateID = States.Countdown
+                this.startCountdown(data.count)
+                return this.stateQuestionCountdown
             case "res":
                 this.stateID = States.Finished
-            return this.stateEnding
+                return this.stateEnding
             default:
                 console.warn("Expecting results/feedback, got " + ev.action)
                 return this.state
         }
-
-        this.stateID = States.Answer
-        return this.stateQuestion
     }
 
     // Put the FSM into an infinite loop - we are done
@@ -243,6 +263,17 @@ class PlayerState {
             }
             (<number>this.countdown)--
         }, 1000)
+    }
+
+    // FRONTEND FUNCTIONS
+    // ------------------
+
+    // Submits this answer to the server.
+    // Does no shift in state; handled by main state machine.
+    answer(index: number): void {
+        common.SendMessage(conn, "ans", {
+            id: index,
+        })
     }
 }
 

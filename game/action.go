@@ -247,9 +247,9 @@ func (s StartGame) Perform(game *Game) {
 		}
 
 		// NOTE: calling func here, as shift must be immediate
+		game.state.Host.SendMessage(CommandStartAck, struct{}{})
 		game.sf = game.Question()
 		game.state.Status = GameRunning
-		game.state.Host.SendMessage(CommandStartAck, struct{}{})
 
 		log.Println(game.PIN, "now commencing")
 		return
