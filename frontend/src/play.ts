@@ -249,6 +249,9 @@ class PlayerState {
     }
 
     private startCountdown(len: number, title?: string): void {
+        // Clear any existing countdown
+        window.clearInterval(this.countdownHndl)
+
         this.stateID = States.Countdown
         if (title) {
             this.countdown = title
