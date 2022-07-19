@@ -1,7 +1,7 @@
 #!/bin/sh
 
-trap "pkill gahoot" 2 9 15
-find -name "*.go" -print \
+trap "pkill gahoot" 2 15
+find ./ -name "*.go" -print \
 	     -or -name "*.ts" -print \
 	     -or -name "node_modules" -prune \
 	     -or -name ".genjs" -prune \
