@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	upgrader websocket.Upgrader = websocket.Upgrader{
+	upgrader = websocket.Upgrader{
 		ReadBufferSize:    4096,
 		WriteBufferSize:   4096,
 		EnableCompression: false,
