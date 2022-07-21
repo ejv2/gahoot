@@ -315,3 +315,40 @@ input.error {
         color: var(--red);
         text-decoration: line-through;
 }
+
+.game-answers-title {
+        height: 20vh;
+        width: 100vw;
+        background: white;
+        margin: 0;
+}
+
+.game-answers {
+        display: grid;
+        width: 100vw;
+        height: 80vh;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 50% 50%;
+        grid-row-gap: 0;
+}
+
+.game-answer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0;
+}
+
+.game-answer:nth-of-type(1) {
+        background-color: var(--red);
+}
+.game-answer:nth-of-type(2) {
+        background-color: var(--yellow);
+}
+.game-answer:nth-of-type(3) {
+        background-color: var(--green);
+}
+.game-answer:nth-of-type(4) {
+        background-color: var(--blue);
+}

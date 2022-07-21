@@ -36,7 +36,10 @@ interface QuestionData {
     title: string
     image?: string
     time: number
-    answers: string[]
+    answers: {
+        title: string
+        correct: boolean
+    }[]
 
     index: number
     total: number
@@ -94,7 +97,7 @@ class HostState {
             title: "Error!",
             image: "https://developer.valvesoftware.com/w/images/5/5b/Missing_textures_example.png",
             time: 10,
-            answers: ["1", "2", "3", "4"],
+            answers: [],
             index: 1,
             total: 10,
         }

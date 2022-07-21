@@ -50,6 +50,8 @@ readloop:
 			ev <- StartGame{}
 		case MessageNextQuestion:
 			ev <- NextQuestion{}
+		case MessageAnswerNow:
+			ev <- StartAnswer{}
 		}
 
 		select {

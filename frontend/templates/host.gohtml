@@ -39,6 +39,15 @@
 			<div><span x-text="$store.host.question.index"></span> / <span x-text="$store.host.question.total"></span></div>
 			<p x-text="countdownCount" />
 		</div>
+
+		<div id="answers" x-show="stateID == 4" >
+			<h1 x-text="$store.host.question.title" class="game-answers-title"></h1>
+			<div class="game-answers">
+				<template x-for="ans in $store.host.question.answers">
+					<h2 class="game-answer" x-text="ans.title" />
+				</template>
+			</div>
+		</div>
 	</body>
 
 </html>

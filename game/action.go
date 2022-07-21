@@ -276,6 +276,13 @@ func (n NextQuestion) Perform(game *Game) {
 	game.state.CurrentQuestion++
 }
 
+type StartAnswer struct{}
+
+func (s StartAnswer) Perform(game *Game) {
+	game.state.countdownDone = true
+	go game.state.Host.SendMessage(CommandQuestionAck, struct{}{})
+}
+
 type Answer struct {
 	PlayerID, Number int
 }
