@@ -320,6 +320,8 @@ input.error {
         height: 20vh;
         width: 100vw;
         background: white;
+        color: black;
+        font-weight: bold;
         margin: 0;
 }
 
@@ -335,9 +337,14 @@ input.error {
 .game-answer {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         margin: 0;
+        padding: 10px;
+}
+
+.game-answer-text {
+        margin-left: 20px;
 }
 
 .game-answer:nth-of-type(1) {

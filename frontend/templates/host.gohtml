@@ -44,7 +44,10 @@
 			<h1 x-text="$store.host.question.title" class="game-answers-title"></h1>
 			<div class="game-answers">
 				<template x-for="ans in $store.host.question.answers">
-					<h2 class="game-answer" x-text="ans.title" />
+					<div class="game-answer">
+						<p>Symbol here</p>
+						<p class="game-answer-text" x-text="ans.title" />
+					</div>
 				</template>
 			</div>
 		</div>
