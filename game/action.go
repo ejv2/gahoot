@@ -281,6 +281,9 @@ type StartAnswer struct{}
 func (s StartAnswer) Perform(game *Game) {
 	game.state.countdownDone = true
 	go game.state.Host.SendMessage(CommandQuestionAck, struct{}{})
+	for _, plr := range game.state.Players {
+		plr.SendMessage(CommandNewQuestion, game.Questions[game.state.CurrentQuestion])
+	}
 }
 
 type Answer struct {

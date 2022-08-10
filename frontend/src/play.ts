@@ -175,7 +175,7 @@ class PlayerState {
 
             this.stateID = States.Countdown
             this.startCountdown(data.count)
-            return this.stateQuestion
+            return this.stateQuestionCountdown
         }
 
         return this.state
