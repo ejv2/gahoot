@@ -278,12 +278,12 @@ class HostState {
         }
 
         this.stateID = States.StartCountdown
-        common.SendMessage(conn, "count", 10)
+        common.SendMessage(conn, "count", 5)
         let startmsg = <common.GameMessage>{
             action: "start",
             data: {}
         }
-        this.startCountdown(10, startmsg, this.title)
+        this.startCountdown(5, startmsg, this.title)
         this.state = this.stateStartCountdown
     }
 
