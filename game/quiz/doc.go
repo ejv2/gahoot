@@ -3,11 +3,11 @@
 //
 // Every quiz in Gahoot is uniquely identified by its SHA256 hash, which is
 // calculated based on the following simple algorithm:
-//	1) Re-order fields to be in the same order as quiz.Quiz
-//	2) Add any missing fields in the same corresponding position with their
-//	   Go zero value
-//	3) Minify such that any non-significant whitespace is elided
-//	4) Take a SHA256 hash over the resulting raw bytes
+//  1. Re-order fields to be in the same order as quiz.Quiz
+//  2. Add any missing fields in the same corresponding position with their
+//     Go zero value
+//  3. Minify such that any non-significant whitespace is elided
+//  4. Take a SHA256 hash over the resulting raw bytes
 //
 // This hashing system and protocol allows a way for gameservers to exchange
 // games if needed, and for individual servers to easily keep track of what

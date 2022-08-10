@@ -1,9 +1,9 @@
 /*
 Gahoot is a lightweight, distributed, FOSS rewrite of Gahoot in Go. It has the
 following design goals:
-	1) Be lightweight enough to be run by individual users
-	2) To be cross platform, both the server and client
-	3) To encourage a distributed network of game servers and players
+ 1. Be lightweight enough to be run by individual users
+ 2. To be cross platform, both the server and client
+ 3. To encourage a distributed network of game servers and players
 
 This IS NOT a feature complete remake of Kahoot. Instead, it is an opinionated
 rewrite of what I think makes the game special. It IS NOT the same game and IS

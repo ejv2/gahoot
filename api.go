@@ -26,9 +26,9 @@ var (
 //
 // NOTE: API does not directly validate anything - simply hands off to the game
 // runner. HOWEVER, this action will fail if:
-//	- The game does not exist
-//	- The game hit the player cap
-//	- The game has ended
+//   - The game does not exist
+//   - The game hit the player cap
+//   - The game has ended
 //
 // Additionally, this call will not block if still waiting on the host. The client
 // will be connected and initialised, but will be instructed to simply do nothing
@@ -71,7 +71,7 @@ func handlePlayAPI(c *gin.Context) {
 //
 // NOTE: At this stage, no validation is performed. HOWEVER, this action will fail
 // if:
-//	- The game does not exist
+//   - The game does not exist
 //
 // This websocket lasts the lifetime of a game. If the client disconnects for any
 // reason (missed hearbeats or manual disconnect), the game will be immediately
