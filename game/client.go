@@ -110,6 +110,10 @@ func (c Client) writer(interval time.Duration) {
 // blocking either until the message has sent or the connection terminates.
 // This call CANNOT block forever.
 func (c Client) Send(msg string) {
+	if !c.Connected {
+		return
+	}
+
 	select {
 	case c.send <- msg:
 	case <-c.Ctx.Done():
