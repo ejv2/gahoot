@@ -334,6 +334,10 @@ input.error {
         grid-row-gap: 0;
 }
 
+.game-answers-full {
+        height: 100vh;
+}
+
 .game-answer {
         display: flex;
         flex-direction: row;

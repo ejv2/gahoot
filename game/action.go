@@ -304,6 +304,8 @@ func (a Answer) Perform(game *Game) {
 		return
 	}
 
+	log.Println(a.PlayerID, "answered", game.state.CurrentQuestion, "with", a.Number, "in", game.PIN)
+
 	game.state.gotAnswers++
 	game.state.Players[a.PlayerID-1].answer = a.Number
 }

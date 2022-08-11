@@ -2,6 +2,7 @@ package game
 
 import (
 	"log"
+	"strconv"
 )
 
 // PlayerInfo is a message object, mirroring the PlayerData interface on
@@ -54,7 +55,7 @@ func (p Player) Run(ev chan Action) {
 
 readloop:
 	for {
-		cmd, _, err := p.ReadString()
+		cmd, data, err := p.ReadString()
 		if err != nil {
 			log.Println(err)
 			p.CloseReason(err.Error())
@@ -62,6 +63,19 @@ readloop:
 		}
 
 		switch cmd {
+		case MessageAnswer:
+			ans, err := strconv.ParseUint(data, 10, 32)
+			if err != nil || ans <= 0 {
+				log.Println(p.Nick, "submitted invalid answer", data)
+				p.CloseReason("invalid answer ID")
+				return
+			}
+			ev <- Answer{p.ID, int(ans)}
+			p.SendMessage(CommandAnswerAck, struct{}{})
+		default:
+			log.Println(p.ID, "sent bad message", cmd)
+			p.CloseReason("invalid command")
+			return
 		}
 
 		select {

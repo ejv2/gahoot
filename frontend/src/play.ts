@@ -157,6 +157,7 @@ class PlayerState {
     stateWaiting(ev: common.GameMessage): common.GameState<PlayerState> {
         if (ev.action == "ques") {
             this.stateID = States.Question
+            this.question = <QuestionData>ev.data;
             return this.stateQuestion
         }
         if (ev.action != "gcount") {
@@ -274,9 +275,8 @@ class PlayerState {
     // Submits this answer to the server.
     // Does no shift in state; handled by main state machine.
     answer(index: number): void {
-        common.SendMessage(conn, "ans", {
-            id: index,
-        })
+        // NOTE: we need to increment i, as server expects 1-indexed list
+        common.SendMessage(conn, "ans", ++index)
     }
 }
 
