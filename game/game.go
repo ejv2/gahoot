@@ -153,7 +153,9 @@ func (game *Game) Question() StateFunc {
 }
 
 // AcceptAnswers is active when the game is idle accepting answers until
-// every player has answered.
+//  1. Every player has answered
+//  2. The time runs out (host will notify us)
+//  3. The host manually skips the question (host will notify us)
 func (game *Game) AcceptAnswers() StateFunc {
 	game.state.acceptingAnswers = true
 	if game.state.gotAnswers >= game.state.wantAnswers {
