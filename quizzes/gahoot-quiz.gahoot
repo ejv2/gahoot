@@ -7,7 +7,7 @@
 	"questions": [
 		{
 			"title": "What is Gahoot?",
-			"duration": 10,
+			"time": 10,
 			"image_url": null,
 			"answers": [
 				{"title": "A website", "correct": true},
@@ -18,7 +18,7 @@
 		},
 		{
 			"title": "What does Gahoot do?",
-			"duration": 10,
+			"time": 10,
 			"image_url": null,
 			"answers": [
 				{"title": "Allows archiving your photographs", "correct": false},
@@ -29,7 +29,7 @@
 		},
 		{
 			"title": "What is the purpose of this quiz?",
-			"duration": 5,
+			"time": 5,
 			"image_url": null,
 			"answers": [
 				{"title": "To introduce you to your own keyboard", "correct": false},
