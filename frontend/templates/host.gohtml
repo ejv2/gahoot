@@ -40,8 +40,15 @@
 			<p x-text="countdownCount" />
 		</div>
 
-		<div id="answers" x-show="stateID == 4" >
-			<h1 x-text="$store.host.question.title" class="game-answers-title"></h1>
+		<!-- Question answer options -->
+		<div id="answers" x-show="stateID == 4" class="game-container">
+			<div class="game-answers-title">
+				<h1 x-text="$store.host.question.title"></h1>
+				<div>
+					<a @click="$store.host.skip()">Skip</a>
+					<span x-text="$store.host.questionCountdown"></span>
+				</div>
+			</div>
 			<div class="game-answers">
 				<template x-for="ans in $store.host.question.answers">
 					<div class="game-answer">

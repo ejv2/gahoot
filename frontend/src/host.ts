@@ -223,7 +223,7 @@ class HostState {
 
         this.stateID = States.QuestionCountdown
         this.question = <QuestionData>ev.data
-        this.startCountdown(10, {
+        this.startCountdown(5, {
             action: "sans",
             data: {},
         }, this.question.title)
@@ -232,17 +232,17 @@ class HostState {
 
     // question countdown ended; waiting for submissions
     stateQuestion(ev: common.GameMessage): common.GameState<HostState> {
-        this.questionCountdown = this.question.time
-        this.questionCountdownHndl = window.setInterval(() => {
-            if (this.questionCountdown-- <= 0) {
-                window.clearInterval(this.questionCountdownHndl)
-                common.SendMessage(conn, "time", {})
-            }
-        }, 1000)
-
         switch (ev.action) {
             case "quack":
                 this.stateID = States.QuestionAsk
+                this.questionCountdown = this.question.time
+                this.questionCountdownHndl = window.setInterval(() => {
+                    this.questionCountdown--;
+                    if (this.questionCountdown <= 0) {
+                        this.skip()
+                        return
+                    }
+                }, 1000)
                 return this.state
             case "nans":
                 this.gotAnswers++;
@@ -285,6 +285,18 @@ class HostState {
         }
         this.startCountdown(5, startmsg, this.title)
         this.state = this.stateStartCountdown
+    }
+
+    // Ends the current question
+    //
+    // Desipte the name, this does not have to be a manual skip. The time
+    // running out also calls this function.
+    //
+    // Does not mutate state, as we have to wait for a "qend" packet from the
+    // server first.
+    skip(): void {
+        window.clearInterval(this.questionCountdownHndl)
+        common.SendMessage(conn, "time", {})
     }
 
     // Start the visual countdown on screen.

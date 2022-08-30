@@ -317,12 +317,16 @@ input.error {
 }
 
 .game-answers-title {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
         height: 20vh;
         width: 100vw;
         background: white;
         color: black;
         font-weight: bold;
         margin: 0;
+        padding: 0;
 }
 
 .game-answers {
