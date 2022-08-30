@@ -34,7 +34,8 @@ type Player struct {
 
 	Banned bool
 
-	answer int
+	canAnswer bool
+	answer    int
 }
 
 // Run is the game runner thread. It continually receives from the "conn"

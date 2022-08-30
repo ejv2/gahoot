@@ -143,10 +143,13 @@ func (game *Game) Question() StateFunc {
 	}
 	go game.state.Host.SendMessage(CommandNewQuestion, q)
 
-	for _, plr := range game.state.Players {
-		go plr.SendMessage(CommandQuestionCount, struct {
-			Count int `json:"count"`
-		}{10})
+	for i, plr := range game.state.Players {
+		if plr.Connected {
+			game.state.Players[i].canAnswer = true
+			go plr.SendMessage(CommandQuestionCount, struct {
+				Count int `json:"count"`
+			}{5})
+		}
 	}
 
 	return game.sf
@@ -160,6 +163,9 @@ func (game *Game) AcceptAnswers() StateFunc {
 	game.state.acceptingAnswers = true
 	if game.state.gotAnswers >= game.state.wantAnswers {
 		game.state.acceptingAnswers = false
+		game.state.countdownDone = false
+		game.state.Host.SendMessage(CommandQuestionOver, struct{}{})
+		// Notify players here (+ mark all as not answerable)
 		return game.Sustain
 	}
 

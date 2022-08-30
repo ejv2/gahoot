@@ -52,6 +52,8 @@ readloop:
 			ev <- NextQuestion{}
 		case MessageAnswerNow:
 			ev <- StartAnswer{}
+		case MessageQuestionEnd:
+			ev <- EndAnswer{}
 		}
 
 		select {

@@ -46,7 +46,7 @@ const (
 	MessageStartGame    = "start"
 	MessageNextQuestion = "next"
 	MessageAnswerNow    = "sans"
-	MessageTimeUp       = "time"
+	MessageQuestionEnd  = "time"
 )
 
 // Client mechanism constants.

@@ -246,9 +246,8 @@ func (s StartGame) Perform(game *Game) {
 			log.Println(game.PIN, "attempted to start with", len(game.state.Players), "(too few; rejected)")
 		}
 
-		// NOTE: calling func here, as shift must be immediate
 		game.state.Host.SendMessage(CommandStartAck, struct{}{})
-		game.sf = game.Question()
+		game.sf = game.Question
 		game.state.Status = GameRunning
 
 		log.Println(game.PIN, "now commencing")
@@ -286,6 +285,12 @@ func (s StartAnswer) Perform(game *Game) {
 	}
 }
 
+type EndAnswer struct{}
+
+func (s EndAnswer) Perform(game *Game) {
+	game.state.gotAnswers = game.state.wantAnswers
+}
+
 type Answer struct {
 	PlayerID, Number int
 }
@@ -295,12 +300,19 @@ func (a Answer) Perform(game *Game) {
 		panic("answer: invalid answer: less than 1")
 	}
 	if !game.state.acceptingAnswers {
+		log.Printf("%d attempted to answer out of answer time [%s]", a.PlayerID, game.PIN)
 		return
 	}
 	if a.PlayerID <= 0 || a.PlayerID > len(game.state.Players) {
+		log.Printf("invalid player attempted to answer (ID: %d) [%s]", a.PlayerID, game.PIN)
+		return
+	}
+	if !game.state.Players[a.PlayerID-1].canAnswer {
+		log.Printf("%d attempted to steal an answer slot [%s]", a.PlayerID, game.PIN)
 		return
 	}
 	if game.state.Players[a.PlayerID-1].answer > 0 {
+		log.Printf("%d attempted multiple answer [%s]", a.PlayerID, game.PIN)
 		return
 	}
 
