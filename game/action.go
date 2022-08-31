@@ -202,13 +202,7 @@ func (c ConnectionUpdate) Perform(game *Game) {
 	game.state.Players[c.PlayerID-1].Connected = c.Connected
 
 	plr := game.state.Players[c.PlayerID-1]
-	dat := PlayerInfo{
-		ID:      plr.ID,
-		Nick:    plr.Nick,
-		Score:   plr.Score,
-		Correct: plr.Correct,
-	}
-	game.state.Host.SendMessage(CommandDisconPlayer, dat)
+	game.state.Host.SendMessage(CommandDisconPlayer, plr.Info())
 }
 
 // KickPlayer disconnects and bans a player ID from this game.
@@ -224,13 +218,7 @@ func (k KickPlayer) Perform(game *Game) {
 	game.state.Players[k.ID-1].Cancel()
 
 	plr := game.state.Players[k.ID-1]
-	dat := PlayerInfo{
-		ID:      plr.ID,
-		Nick:    plr.Nick,
-		Score:   plr.Score,
-		Correct: plr.Correct,
-	}
-	game.state.Host.SendMessage(CommandRemovePlayer, dat)
+	game.state.Host.SendMessage(CommandRemovePlayer, plr.Info())
 }
 
 // StartGame either begins a game or game countdown.

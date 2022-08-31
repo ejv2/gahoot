@@ -6,7 +6,8 @@ import (
 )
 
 // PlayerInfo is a message object, mirroring the PlayerData interface on
-// the client.
+// the client. It should only be used for formatted transmission over a
+// websocket.
 type PlayerInfo struct {
 	ID      int    `json:"id"`
 	Nick    string `json:"name"`
@@ -89,4 +90,15 @@ readloop:
 	// If we reach here, we are gracefully ending the player session
 	// error-free
 	p.Close()
+}
+
+// Info extracts a player's information into a PlayerInfo struct, stuitable for
+// websocket transmission to a client.
+func (p Player) Info() PlayerInfo {
+	return PlayerInfo{
+		ID:      p.ID,
+		Nick:    p.Nick,
+		Score:   p.Score,
+		Correct: p.Correct,
+	}
 }
