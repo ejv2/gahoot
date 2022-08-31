@@ -12,7 +12,7 @@ do
 	# Copy dependencies
 	compiled=$(echo "$f" | sed -E 's/frontend\/src\/(.*)\.ts/frontend\/.genjs\/\1.js/')
 	[ -f "$compiled" ] || continue
-	imp=$(grep -Eo "from (['\"])?\w+(['\"])?;?$" "$f" | tr -d ";'\"" | sed 's/from\s//')
+	imp=$(grep -Eo "^import .* from (['\"])?\w+(['\"])?;?$" "$f" | tr -d ";'\"" | sed 's/.*\s\+from\s\+//')
 	for i in $imp
 	do
 		mod="frontend/node_modules/$i"
