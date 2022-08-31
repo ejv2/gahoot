@@ -2,6 +2,7 @@ package game
 
 import (
 	"context"
+	"math"
 	"time"
 
 	"github.com/ethanv2/gahoot/game/quiz"
@@ -26,8 +27,11 @@ type Status int
 
 // Gameplay constants.
 const (
-	MaxGameTime = time.Minute * 45
-	MinPlayers  = 3
+	MaxGameTime    = time.Minute * 45
+	MinPlayers     = 3
+	BasePoints     = 1000
+	StreakBonus    = 100
+	MaxStreakBonus = 500
 )
 
 // StateFunc is a current state in the finite state machine of the game state.
@@ -47,6 +51,7 @@ type State struct {
 
 	countdownDone           bool
 	acceptingAnswers        bool
+	answersAt               time.Time
 	wantAnswers, gotAnswers int
 }
 
@@ -80,6 +85,35 @@ func NewGame(pin Pin, quiz quiz.Quiz, reaper chan Pin, maxGameTime time.Duration
 		Action:  make(chan Action),
 		Request: make(chan chan State),
 	}
+}
+
+// Score returns the number of points that should be awarded for an answer.
+// The rules which govern this are as follows:
+//  1. No points are awarded for an incorrect answer
+//  2. As the time taken to answer tends toward zero, points tend toward
+//     2*base.
+//  3. 100 additional points are awarded for each correct answer in a row
+//     (streak), up to a maximum of 500 bonus streak points
+//  4. At half time, no bonus points are awarded. After half time, bonus points
+//     are negative up to -base (no points awarded at all, not counting
+//     bonuses)
+//
+// This function does all calculations as floating points, but truncates the
+// result in the end.
+// If taken > allowed or taken == 0, Score panics (these must never be allowed
+// to happen).
+func Score(correct bool, base, streak int, taken, allowed time.Duration) int64 {
+	if !correct || allowed == 0 {
+		return 0
+	}
+	if taken > allowed || taken < 0 {
+		panic("score: invalid time taken while scoring")
+	}
+
+	start := float64(base)
+	start += float64(base) * (1.0 - (float64(taken) / (float64(allowed) / 2)))
+	start += math.Min(MaxStreakBonus, StreakBonus*float64(streak))
+	return int64(start)
 }
 
 // Run enters into the main game loop for this game instance, listening for events
@@ -160,12 +194,56 @@ func (game *Game) Question() StateFunc {
 //  2. The time runs out (host will notify us)
 //  3. The host manually skips the question (host will notify us)
 func (game *Game) AcceptAnswers() StateFunc {
+	type feedback struct {
+		Leaderboard `json:"leaderboard"`
+		Correct     bool  `json:"correct"`
+		Points      int64 `json:"points"`
+	}
+
 	game.state.acceptingAnswers = true
 	if game.state.gotAnswers >= game.state.wantAnswers {
+		dats := make([]feedback, len(game.state.Players))
+
 		game.state.acceptingAnswers = false
 		game.state.countdownDone = false
+
+		clip := 6
+		if clip > len(game.state.Players) {
+			clip = len(game.state.Players)
+		}
+
 		game.state.Host.SendMessage(CommandQuestionOver, struct{}{})
-		// Notify players here (+ mark all as not answerable)
+
+		for i, plr := range game.state.Players {
+			correct := false
+			dur := 0
+
+			if plr.answer > 0 {
+				correct = game.Questions[game.state.CurrentQuestion].Answers[plr.answer-1].Correct
+				dur = game.Questions[game.state.CurrentQuestion].Duration
+			}
+
+			if correct {
+				game.state.Players[i].Correct++
+				game.state.Players[i].Streak++
+			} else {
+				game.state.Players[i].Streak = 0
+			}
+
+			score := Score(correct, BasePoints, game.state.Players[i].Streak, plr.answeredAt.Sub(game.state.answersAt), time.Duration(dur)*time.Second)
+			game.state.Players[i].Score += score
+			dats[i] = feedback{
+				Correct: correct,
+				Points:  score,
+			}
+		}
+		board := NewLeaderboard(game.state.Players)
+
+		game.state.Host.SendMessage(CommandSeeResults, board[:clip])
+		for i, elem := range dats {
+			elem.Leaderboard = board
+			game.state.Players[i].SendMessage(CommandQuestionOver, elem)
+		}
 		return game.Sustain
 	}
 

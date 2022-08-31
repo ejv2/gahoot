@@ -16,6 +16,13 @@ export interface GameMessage {
     data: any
 }
 
+export interface PlayerData {
+    id: number
+    name: string
+    score: number
+    correct: number
+}
+
 // State interface
 // Represents a single state in the client finite state machine
 //

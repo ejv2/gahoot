@@ -2,7 +2,9 @@ package game
 
 import (
 	"log"
+	"sort"
 	"strconv"
+	"time"
 )
 
 // PlayerInfo is a message object, mirroring the PlayerData interface on
@@ -13,6 +15,7 @@ type PlayerInfo struct {
 	Nick    string `json:"name"`
 	Score   int64  `json:"score"`
 	Correct int    `json:"correct"`
+	Streak  int    `json:"streak"`
 }
 
 // A Player is one registered player as part of a running game. Each player is
@@ -32,11 +35,13 @@ type Player struct {
 	Nick    string
 	Score   int64
 	Correct int
+	Streak  int
 
 	Banned bool
 
-	canAnswer bool
-	answer    int
+	canAnswer  bool
+	answeredAt time.Time
+	answer     int
 }
 
 // Run is the game runner thread. It continually receives from the "conn"
@@ -72,8 +77,8 @@ readloop:
 				p.CloseReason("invalid answer ID")
 				return
 			}
-			ev <- Answer{p.ID, int(ans)}
 			p.SendMessage(CommandAnswerAck, struct{}{})
+			ev <- Answer{p.ID, int(ans)}
 		default:
 			log.Println(p.ID, "sent bad message", cmd)
 			p.CloseReason("invalid command")
@@ -99,6 +104,35 @@ func (p Player) Info() PlayerInfo {
 		ID:      p.ID,
 		Nick:    p.Nick,
 		Score:   p.Score,
+		Streak:  p.Streak,
 		Correct: p.Correct,
 	}
+}
+
+// Leaderboard represents a sorted leaderboard of players, sorted by score.
+// It is designed for use with sort.Interface.
+type Leaderboard []PlayerInfo
+
+// NewLeaderboard copies all players from plrs into a new leaderboard.
+func NewLeaderboard(plrs []Player) (l Leaderboard) {
+	l = make([]PlayerInfo, len(plrs))
+	for i, p := range plrs {
+		l[i] = p.Info()
+	}
+	sort.Sort(l)
+	return l
+}
+
+func (l Leaderboard) Len() int {
+	return len(l)
+}
+
+func (l Leaderboard) Less(i, j int) bool {
+	return l[i].Score < l[j].Score
+}
+
+func (l Leaderboard) Swap(i, j int) {
+	tmp := l[i]
+	l[i] = l[j]
+	l[j] = tmp
 }

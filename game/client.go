@@ -24,6 +24,7 @@ const (
 	CommandAnswerAck     = "ansack"
 	CommandQuestionOver  = "qend"
 	CommandSeeResults    = "res"
+	CommandFinalResults  = "fres"
 
 	CommandNewPlayer    = "plr"
 	CommandRemovePlayer = "rmplr"

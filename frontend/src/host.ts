@@ -25,13 +25,6 @@ enum States {
     GameOver
 }
 
-interface PlayerData {
-    id: number
-    name: string
-    score: number
-    correct: number
-}
-
 interface QuestionData {
     title: string
     image?: string
@@ -45,7 +38,8 @@ interface QuestionData {
     total: number
 }
 
-interface Player extends PlayerData {
+
+interface Player extends common.PlayerData {
     connected: boolean
     loading: boolean
 }
@@ -77,6 +71,9 @@ class HostState {
     questionCountdown: number
     private questionCountdownHndl: number
 
+    feedback: common.PlayerData[]
+    feedbackWaiting: boolean
+
     // Initializes data defaults
     //
     // NOTE: Does not do any interaction with events!
@@ -104,6 +101,9 @@ class HostState {
         this.gotAnswers = 0
         this.questionCountdown = this.question.time
         this.questionCountdownHndl = 0
+
+        this.feedback = []
+        this.feedbackWaiting = true
 
         this.state = this.stateWaitingJoin
         this.stateID = States.JoinWaiting
@@ -159,7 +159,7 @@ class HostState {
         this.stateID = States.JoinWaiting
 
 
-        let plr = <PlayerData>ev.data
+        let plr = <common.PlayerData>ev.data
         switch (ev.action) {
             // Remove player
             case "rmplr":
@@ -257,6 +257,17 @@ class HostState {
     }
 
     stateFeedback(ev: common.GameMessage): common.GameState<HostState> {
+        switch (ev.action) {
+            case "res":
+                this.feedbackWaiting = false
+                this.feedback = ev.data
+                console.log(this.feedback)
+                break
+            default:
+                console.warn("unexpected command "+ev.action)
+                break
+        }
+
         return this.state
     }
 

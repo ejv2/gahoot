@@ -267,6 +267,7 @@ type StartAnswer struct{}
 
 func (s StartAnswer) Perform(game *Game) {
 	game.state.countdownDone = true
+	game.state.answersAt = time.Now()
 	go game.state.Host.SendMessage(CommandQuestionAck, struct{}{})
 	for _, plr := range game.state.Players {
 		plr.SendMessage(CommandNewQuestion, game.Questions[game.state.CurrentQuestion])
@@ -308,6 +309,7 @@ func (a Answer) Perform(game *Game) {
 
 	game.state.gotAnswers++
 	game.state.Players[a.PlayerID-1].answer = a.Number
+	game.state.Players[a.PlayerID-1].answeredAt = time.Now()
 }
 
 // EndGame shuts down the game runner, thereby terminating the current

@@ -58,6 +58,13 @@
 				</template>
 			</div>
 		</div>
+
+		<div id="feedback" x-show="stateID == 5" class="game-container">
+			<div x-show="$store.host.feedbackWaiting">
+				<h2>Collecting results</h2>
+				<p>Please wait...</p>
+			</div>
+		</div>
 	</body>
 
 </html>

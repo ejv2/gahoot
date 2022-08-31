@@ -35,10 +35,9 @@ interface QuestionData {
 }
 
 interface FeedbackData {
-    correct: boolean,
-    points: number,
-    placement: number,
-    behind: string,
+    leaderboard: common.PlayerData[]
+    correct: boolean
+    points: number
 }
 
 // Set up alpine on the window
@@ -93,10 +92,9 @@ class PlayerState {
             ],
         }
         this.feedback = {
+            leaderboard: [],
             correct: false,
             points: 0,
-            behind: "Gabe Newell",
-            placement: 3
         }
         this.submitSpinner = false
 
@@ -201,9 +199,11 @@ class PlayerState {
                 this.stateID = States.Pending
                 // TODO: Randomize extremely annoying message here
                 this.startCountdown(-1, "Were you too fast?")
-                return this.stateWaitingFeedback
+                return this.state
             case "qend":
                 this.stateID = States.Answer
+                this.feedback = <FeedbackData>ev.data
+                this.points += this.feedback.points
                 return this.stateFeedback
             default:
                 console.warn("Unexpected message "+ev.action)
@@ -211,30 +211,15 @@ class PlayerState {
         }
     }
 
-    // "Classroom genius?"
-    stateWaitingFeedback(ev: common.GameMessage): common.GameState<PlayerState> {
-        if (ev.action != "qend") {
-            console.warn("Expecting question end, got " + ev.action)
-            return this.state
-        }
-
-        return this.stateFeedback
-    }
-
     // Showing if answer was correct or not
     stateFeedback(ev: common.GameMessage): common.GameState<PlayerState> {
-        this.feedback = <FeedbackData>ev.data
-
-        this.points += this.feedback.points
-        this.rank = this.feedback.placement
-
         switch (ev.action) {
             case "count":
                 let data = <CountdownData>ev.data
                 this.stateID = States.Countdown
                 this.startCountdown(data.count)
                 return this.stateQuestionCountdown
-            case "res":
+            case "qend":
                 this.stateID = States.Finished
                 return this.stateEnding
             default:
