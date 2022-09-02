@@ -49,10 +49,10 @@ type State struct {
 	Players         []Player
 	CurrentQuestion int
 
-	countdownDone           bool
-	acceptingAnswers        bool
-	answersAt               time.Time
-	wantAnswers, gotAnswers int
+	countdownDone    bool
+	acceptingAnswers bool
+	questionSkipped  bool
+	answersAt        time.Time
 }
 
 // Game is a single instance of a running game.
@@ -100,7 +100,7 @@ func NewGame(pin Pin, quiz quiz.Quiz, reaper chan Pin, maxGameTime time.Duration
 //
 // This function does all calculations as floating points, but truncates the
 // result in the end.
-// If taken > allowed or taken == 0, Score panics (these must never be allowed
+// If taken > allowed or taken < 0, Score panics (these must never be allowed
 // to happen).
 func Score(correct bool, base, streak int, taken, allowed time.Duration) int64 {
 	if !correct || allowed == 0 {
@@ -162,7 +162,6 @@ func (game *Game) WaitForHost() StateFunc {
 func (game *Game) Question() StateFunc {
 	if game.state.countdownDone {
 		game.state.acceptingAnswers = true
-		game.state.gotAnswers, game.state.wantAnswers = 0, len(game.state.Players)
 		return game.AcceptAnswers
 	}
 
@@ -200,8 +199,15 @@ func (game *Game) AcceptAnswers() StateFunc {
 		Points      int64 `json:"points"`
 	}
 
+	pending := false
+	for _, plr := range game.state.Players {
+		if plr.Connected && plr.canAnswer && plr.answer <= 0 {
+			pending = true
+		}
+	}
+
 	game.state.acceptingAnswers = true
-	if game.state.gotAnswers >= game.state.wantAnswers {
+	if !pending || game.state.questionSkipped {
 		dats := make([]feedback, len(game.state.Players))
 
 		game.state.acceptingAnswers = false
