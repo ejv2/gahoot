@@ -18,7 +18,6 @@ enum States {
     Waiting,
     Countdown,
     Question,
-    Pending,
     Answer,
     Finished
 }
@@ -63,6 +62,8 @@ class PlayerState {
     private countdownHndl: number
     countdown: number | string
 
+    feedbackPending: boolean
+
     question: QuestionData
     feedback: FeedbackData
     submitSpinner: boolean
@@ -96,6 +97,7 @@ class PlayerState {
             correct: false,
             points: 0,
         }
+        this.feedbackPending = true
         this.submitSpinner = false
 
         this.state = this.stateWaiting
@@ -196,14 +198,14 @@ class PlayerState {
     stateQuestion(ev: common.GameMessage): common.GameState<PlayerState> {
         switch (ev.action) {
             case "ansack":
-                this.stateID = States.Pending
-                // TODO: Randomize extremely annoying message here
-                this.startCountdown(-1, "Were you too fast?")
+                this.stateID = States.Answer
+                this.feedbackPending = true
                 return this.state
             case "qend":
                 this.stateID = States.Answer
                 this.feedback = <FeedbackData>ev.data
                 this.points += this.feedback.points
+                this.feedbackPending = false
                 return this.stateFeedback
             default:
                 console.warn("Unexpected message "+ev.action)
@@ -219,7 +221,7 @@ class PlayerState {
                 this.stateID = States.Countdown
                 this.startCountdown(data.count)
                 return this.stateQuestionCountdown
-            case "qend":
+            case "gend":
                 this.stateID = States.Finished
                 return this.stateEnding
             default:

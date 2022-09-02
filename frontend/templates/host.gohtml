@@ -64,6 +64,10 @@
 				<h2>Collecting results</h2>
 				<p>Please wait...</p>
 			</div>
+
+			<div x-show="!$store.host.feedbackWaiting">
+				<button @click="$store.host.next()">Next question</button>
+			</div>
 		</div>
 	</body>
 
