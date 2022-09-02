@@ -261,6 +261,14 @@ type NextQuestion struct{}
 func (n NextQuestion) Perform(game *Game) {
 	game.sf = game.Question
 	game.state.CurrentQuestion++
+
+	game.state.countdownDone = false
+	game.state.acceptingAnswers = false
+	game.state.questionSkipped = false
+	for i := range game.state.Players {
+		game.state.Players[i].canAnswer = false
+		game.state.Players[i].answer = 0
+	}
 }
 
 type StartAnswer struct{}
@@ -277,7 +285,7 @@ func (s StartAnswer) Perform(game *Game) {
 type EndAnswer struct{}
 
 func (s EndAnswer) Perform(game *Game) {
-	game.state.gotAnswers = game.state.wantAnswers
+	game.state.questionSkipped = true
 }
 
 type Answer struct {

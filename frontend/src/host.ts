@@ -306,8 +306,16 @@ class HostState {
     // Does not mutate state, as we have to wait for a "qend" packet from the
     // server first.
     skip(): void {
-        window.clearInterval(this.questionCountdownHndl)
+        clearInterval(this.questionCountdownHndl)
         common.SendMessage(conn, "time", {})
+
+        this.gotAnswers = 0
+    }
+
+    next(): void {
+        common.SendMessage(conn, "next", {})
+        this.state = this.stateQuestionCountdown
+        this.stateID = States.QuestionCountdown
     }
 
     // Start the visual countdown on screen.
