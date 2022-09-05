@@ -49,10 +49,17 @@ type State struct {
 	Players         []Player
 	CurrentQuestion int
 
-	countdownDone    bool
+	// Has the host completed the countdown?
+	countdownDone bool
+	// Curently in answer time?
 	acceptingAnswers bool
+	// Is this the last player?
+	// Used to prevent client race between ansack and qend messages.
 	lastPlayer bool
+	// Has the host skipped the question?
 	questionSkipped bool
+	// Time at which answers begin being accepted.
+	// Used to calculate points bonus from time taken.
 	answersAt time.Time
 }
 
