@@ -232,7 +232,7 @@ class PlayerState {
 
     // Put the FSM into an infinite loop - we are done
     // Any further messages are ignored, including closes
-    stateEnding(ev: common.GameMessage): common.GameState<PlayerState> {
+    stateEnding(): common.GameState<PlayerState> {
         return this.stateEnding
     }
 
