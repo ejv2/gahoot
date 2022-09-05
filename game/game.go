@@ -51,8 +51,9 @@ type State struct {
 
 	countdownDone    bool
 	acceptingAnswers bool
-	questionSkipped  bool
-	answersAt        time.Time
+	lastPlayer bool
+	questionSkipped bool
+	answersAt time.Time
 }
 
 // Game is a single instance of a running game.
@@ -199,11 +200,16 @@ func (game *Game) AcceptAnswers() StateFunc {
 		Points      int64 `json:"points"`
 	}
 
-	pending := false
+	pending, count := false, 0
 	for _, plr := range game.state.Players {
 		if plr.Connected && plr.canAnswer && plr.answer <= 0 {
 			pending = true
+			count++
 		}
+	}
+	// Only waiting on one player, so set lastPlayer flag
+	if count == 1 {
+		game.state.lastPlayer = true
 	}
 
 	game.state.acceptingAnswers = true
@@ -212,6 +218,7 @@ func (game *Game) AcceptAnswers() StateFunc {
 
 		game.state.acceptingAnswers = false
 		game.state.countdownDone = false
+		game.state.lastPlayer = false
 
 		clip := 6
 		if clip > len(game.state.Players) {

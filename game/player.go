@@ -77,7 +77,6 @@ readloop:
 				p.CloseReason("invalid answer ID")
 				return
 			}
-			p.SendMessage(CommandAnswerAck, struct{}{})
 			ev <- Answer{p.ID, int(ans)}
 		default:
 			log.Println(p.ID, "sent bad message", cmd)

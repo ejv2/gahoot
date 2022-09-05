@@ -315,6 +315,10 @@ func (a Answer) Perform(game *Game) {
 
 	log.Println(a.PlayerID, "answered", game.state.CurrentQuestion, "with", a.Number, "in", game.PIN)
 
+	if !game.state.lastPlayer {
+		game.state.Players[a.PlayerID-1].SendMessage(CommandAnswerAck, struct{}{})
+	}
+
 	game.state.Players[a.PlayerID-1].answer = a.Number
 	game.state.Players[a.PlayerID-1].answeredAt = time.Now()
 }
