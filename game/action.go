@@ -293,11 +293,13 @@ type Answer struct {
 }
 
 func (a Answer) Perform(game *Game) {
+	atime := time.Now()
+
 	if a.Number < 1 {
 		panic("answer: invalid answer: less than 1")
 	}
-	if !game.state.acceptingAnswers {
-		log.Printf("%d attempted to answer out of answer time [%s]", a.PlayerID, game.PIN)
+	if !game.state.acceptingAnswers || game.state.answersAt.Unix() > atime.Unix() {
+		log.Printf("%d attempted to answer out of answer time (%v) [%s]", a.PlayerID, atime, game.PIN)
 		return
 	}
 	if a.PlayerID <= 0 || a.PlayerID > len(game.state.Players) {
@@ -315,12 +317,12 @@ func (a Answer) Perform(game *Game) {
 
 	log.Println(a.PlayerID, "answered", game.state.CurrentQuestion, "with", a.Number, "in", game.PIN)
 
+	game.state.Players[a.PlayerID-1].answer = a.Number
+	game.state.Players[a.PlayerID-1].answeredAt = atime
+
 	if !game.state.lastPlayer {
 		game.state.Players[a.PlayerID-1].SendMessage(CommandAnswerAck, struct{}{})
 	}
-
-	game.state.Players[a.PlayerID-1].answer = a.Number
-	game.state.Players[a.PlayerID-1].answeredAt = time.Now()
 }
 
 // EndGame shuts down the game runner, thereby terminating the current
