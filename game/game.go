@@ -202,9 +202,9 @@ func (game *Game) Question() StateFunc {
 //  3. The host manually skips the question (host will notify us)
 func (game *Game) AcceptAnswers() StateFunc {
 	type feedback struct {
-		Leaderboard `json:"leaderboard"`
-		Correct     bool  `json:"correct"`
-		Points      int64 `json:"points"`
+		Info    PlayerInfo `json:"leaderboard"`
+		Correct bool       `json:"correct"`
+		Points  int64      `json:"points"`
 	}
 
 	pending, count := false, 0
@@ -253,17 +253,15 @@ func (game *Game) AcceptAnswers() StateFunc {
 			score := Score(correct, BasePoints, game.state.Players[i].Streak, plr.answeredAt.Sub(game.state.answersAt), time.Duration(dur)*time.Second)
 			game.state.Players[i].Score += score
 			dats[i] = feedback{
+				Info:    game.state.Players[i].Info(),
 				Correct: correct,
 				Points:  score,
 			}
+			plr.SendMessage(CommandQuestionOver, dats[i])
 		}
-		board := NewLeaderboard(game.state.Players)
 
+		board := NewLeaderboard(game.state.Players)
 		game.state.Host.SendMessage(CommandSeeResults, board[:clip])
-		for i, elem := range dats {
-			elem.Leaderboard = board
-			game.state.Players[i].SendMessage(CommandQuestionOver, elem)
-		}
 		return game.Sustain
 	}
 

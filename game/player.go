@@ -127,7 +127,9 @@ func (l Leaderboard) Len() int {
 }
 
 func (l Leaderboard) Less(i, j int) bool {
-	return l[i].Score < l[j].Score
+	// Sort in descending order
+	// This sign *IS* the right way around!
+	return l[i].Score > l[j].Score
 }
 
 func (l Leaderboard) Swap(i, j int) {

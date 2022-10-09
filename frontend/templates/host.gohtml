@@ -66,6 +66,18 @@
 			</div>
 
 			<div x-show="!$store.host.feedbackWaiting">
+				<table>
+					<tr>
+						<th>Player</th>
+						<th>Score</th>
+					</tr>
+					<template x-for="fb in $store.host.feedback">
+						<tr>
+							<td x-text="fb.name" />
+							<td x-text="fb.score" />
+						</tr>
+					</template>
+				</table>
 				<button @click="$store.host.next()">Next question</button>
 			</div>
 		</div>

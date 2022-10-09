@@ -71,7 +71,11 @@ class HostState {
     questionCountdown: number
     private questionCountdownHndl: number
 
-    feedback: common.PlayerData[]
+    feedback: {
+        leaderboard: common.PlayerData
+        correct: boolean
+        points: number
+    } | null
     feedbackWaiting: boolean
 
     // Initializes data defaults
@@ -102,7 +106,7 @@ class HostState {
         this.questionCountdown = this.question.time
         this.questionCountdownHndl = 0
 
-        this.feedback = []
+        this.feedback = null
         this.feedbackWaiting = true
 
         this.state = this.stateWaitingJoin
