@@ -259,6 +259,20 @@ func (s StartGame) Perform(game *Game) {
 type NextQuestion struct{}
 
 func (n NextQuestion) Perform(game *Game) {
+	// End of the game
+	if game.state.CurrentQuestion == len(game.Questions)-1 {
+		game.sf = game.GameTerminate
+
+		board := NewLeaderboard(game.state.Players)
+		game.state.Host.SendMessage(CommandFinalResults, board)
+		for _, plr := range game.state.Players {
+			plr.SendMessage(CommandFinalResults, board)
+		}
+
+		// Game terminates on return
+		return
+	}
+
 	game.sf = game.Question
 	game.state.CurrentQuestion++
 
@@ -323,6 +337,11 @@ func (a Answer) Perform(game *Game) {
 	if !game.state.lastPlayer {
 		game.state.Players[a.PlayerID-1].SendMessage(CommandAnswerAck, struct{}{})
 	}
+}
+
+type SendResults struct{}
+
+func (s SendResults) Perform(game *Game) {
 }
 
 // EndGame shuts down the game runner, thereby terminating the current

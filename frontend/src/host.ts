@@ -71,11 +71,7 @@ class HostState {
     questionCountdown: number
     private questionCountdownHndl: number
 
-    feedback: {
-        leaderboard: common.PlayerData
-        correct: boolean
-        points: number
-    } | null
+    feedback: common.PlayerData[] | null
     feedbackWaiting: boolean
 
     // Initializes data defaults
@@ -218,20 +214,28 @@ class HostState {
         return this.stateQuestionCountdown
     }
 
-    // question countdown begins
+    // question countdown begins (alternatively, game ends on new question request)
     stateQuestionCountdown(ev: common.GameMessage): common.GameState<HostState> {
-        if (ev.action != "ques") {
-            console.warn("expected question, got "+ev.action)
-            return this.state
+        switch (ev.action) {
+            // Question
+            case "ques":
+                this.stateID = States.QuestionCountdown
+                this.question = <QuestionData>ev.data
+                this.startCountdown(5, {
+                    action: "sans",
+                    data: {},
+                }, this.question.title)
+                return this.stateQuestion
+
+            // Final result
+            case "fres":
+                this.stateID = States.GameOver
+
+            default:
+                console.warn("expected question, got "+ev.action)
+                return this.state
         }
 
-        this.stateID = States.QuestionCountdown
-        this.question = <QuestionData>ev.data
-        this.startCountdown(5, {
-            action: "sans",
-            data: {},
-        }, this.question.title)
-        return this.stateQuestion
     }
 
     // question countdown ended; waiting for submissions
