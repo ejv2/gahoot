@@ -1,4 +1,4 @@
-module github.com/ethanv2/gahoot
+module github.com/ejv2/gahoot
 
 go 1.18
 

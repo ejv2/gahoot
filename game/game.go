@@ -5,7 +5,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/ethanv2/gahoot/game/quiz"
+	"github.com/ejv2/gahoot/game/quiz"
 )
 
 // Possible game states.

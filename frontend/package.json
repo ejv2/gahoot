@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ethanv2/gahoot.git"
+    "url": "git+https://github.com/ejv2/gahoot.git"
   },
   "keywords": [
     "game",
@@ -17,9 +17,9 @@
   "author": "Ethan Marshall <ethan@ethanjmarshall.co.uk>",
   "license": "AGPL-3.0-only",
   "bugs": {
-    "url": "https://github.com/ethanv2/gahoot/issues"
+    "url": "https://github.com/ejv2/gahoot/issues"
   },
-  "homepage": "https://github.com/ethanv2/gahoot#readme",
+  "homepage": "https://github.com/ejv2/gahoot#readme",
   "devDependencies": {
     "@types/alpinejs": "^3.7.0",
     "typescript": "^4.7.3"

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ethanv2/gahoot/game/quiz"
+	"github.com/ejv2/gahoot/game/quiz"
 )
 
 // HashTests are calculated based on the final representation of the marshalled

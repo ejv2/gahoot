@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ethanv2/gahoot/game/quiz"
+	"github.com/ejv2/gahoot/game/quiz"
 )
 
 // Gameplay constants with no need for configuration.

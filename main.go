@@ -11,9 +11,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 
-	"github.com/ethanv2/gahoot/config"
-	"github.com/ethanv2/gahoot/game"
-	"github.com/ethanv2/gahoot/game/quiz"
+	"github.com/ejv2/gahoot/config"
+	"github.com/ejv2/gahoot/game"
+	"github.com/ejv2/gahoot/game/quiz"
 )
 
 // Core application paths.

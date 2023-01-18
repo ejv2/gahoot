@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ethanv2/gahoot/game"
+	"github.com/ejv2/gahoot/game"
 
 	"github.com/gin-gonic/gin"
 )

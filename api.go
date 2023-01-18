@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 
-	"github.com/ethanv2/gahoot/game"
+	"github.com/ejv2/gahoot/game"
 )
 
 var (
