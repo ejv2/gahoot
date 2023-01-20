@@ -34,9 +34,8 @@
 		<div id="question" x-show="stateID == 4" class="game-container">
 			<div class="game-answers game-answers-full">
 				<template x-for="(ans, i) in $store.game.question.answers">
-					<div @click="$store.game.answer(i)" class="game-answer">
-						<p>Symbol here</p>
-						<p class="game-answer-text" x-text="ans.title" />
+					<div @click="$store.game.answer(i)" class="game-answer game-answer-plr">
+						<img :src="$store.game.icons[i]" />
 					</div>
 				</template>
 			</div>

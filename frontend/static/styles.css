@@ -351,6 +351,11 @@ input.error {
         padding: 10px;
 }
 
+.game-answer-plr {
+        justify-content: center !important;
+        text-align: center;
+}
+
 .game-answer-text {
         margin-left: 20px;
 }

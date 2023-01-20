@@ -50,9 +50,9 @@
 				</div>
 			</div>
 			<div class="game-answers">
-				<template x-for="ans in $store.host.question.answers">
+				<template x-for="(ans, i) in $store.host.question.answers">
 					<div class="game-answer">
-						<p>Symbol here</p>
+						<img :src="$store.host.icons[i]" />
 						<p class="game-answer-text" x-text="ans.title" />
 					</div>
 				</template>

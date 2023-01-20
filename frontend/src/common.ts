@@ -9,6 +9,14 @@
 export const PlayEndpoint = "ws://" + location.host + "/api/play/"
 export const HostEndpoint = "ws://" + location.host + "/api/host/"
 
+// Common icon resource paths
+export const iconpath: string = "/static/assets/"
+export const icons: string[] = [
+    iconpath + "triangle.png",
+    iconpath + "diamond.png",
+    iconpath + "circle.png",
+    iconpath + "square.png",
+]
 
 // GameMessage represents a message received over the websocket channel
 export interface GameMessage {

@@ -12,6 +12,7 @@ import Alpine from "alpinejs"
 let conn: WebSocket
 let plr: PlayerState
 
+
 // Possible game state IDs
 enum States {
     Loading = 1,
@@ -28,8 +29,8 @@ interface CountdownData {
 }
 
 interface QuestionData {
-    title: string,
-    image: string,
+    title: string
+    image: string
     answers: string[]
 }
 
@@ -64,6 +65,7 @@ class PlayerState {
 
     feedbackPending: boolean
 
+    icons : string[]
     question: QuestionData
     feedback: FeedbackData
     submitSpinner: boolean
@@ -92,6 +94,7 @@ class PlayerState {
                 "4"
             ],
         }
+        this.icons = common.icons
         this.feedback = {
             leaderboard: [],
             correct: false,

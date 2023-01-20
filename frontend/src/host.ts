@@ -66,6 +66,7 @@ class HostState {
     players: Player[]
     startError: boolean
 
+    icons: string[]
     question: QuestionData
     gotAnswers: number
     questionCountdown: number
@@ -90,6 +91,7 @@ class HostState {
         this.countdownCount = 10
         this.countdownHndl = 0
 
+        this.icons = common.icons
         this.question = {
             title: "Error!",
             image: "https://developer.valvesoftware.com/w/images/5/5b/Missing_textures_example.png",
