@@ -115,7 +115,7 @@ func Score(correct bool, base, streak int, taken, allowed time.Duration) int64 {
 		return 0
 	}
 	if taken > allowed || taken < 0 {
-		panic("score: invalid time taken while scoring")
+		panic("score: invalid time taken while scoring (took " + allowed.String() + "?)")
 	}
 
 	start := float64(base)

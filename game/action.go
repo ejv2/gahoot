@@ -308,13 +308,18 @@ type Answer struct {
 
 func (a Answer) Perform(game *Game) {
 	atime := time.Now()
+	taken := time.Since(game.state.answersAt).Seconds()
+	maxtaken := (time.Duration(game.Questions[game.state.CurrentQuestion].Duration) * time.Second).Seconds()
 
 	if a.Number < 1 {
 		panic("answer: invalid answer: less than 1")
 	}
-	if !game.state.acceptingAnswers || game.state.answersAt.Unix() > atime.Unix() {
-		log.Printf("%d attempted to answer out of answer time (%v) [%s]", a.PlayerID, atime, game.PIN)
+	if !game.state.acceptingAnswers {
+		log.Printf("%d attempted to answer out of answer time (%v : %v) [%s]", a.PlayerID, atime, time.Since(game.state.answersAt), game.PIN)
 		return
+	}
+	if taken > maxtaken {
+		atime = game.state.answersAt.Add(time.Duration(game.Questions[game.state.CurrentQuestion].Duration) * time.Second)
 	}
 	if a.PlayerID <= 0 || a.PlayerID > len(game.state.Players) {
 		log.Printf("invalid player attempted to answer (ID: %d) [%s]", a.PlayerID, game.PIN)
@@ -329,7 +334,7 @@ func (a Answer) Perform(game *Game) {
 		return
 	}
 
-	log.Println(a.PlayerID, "answered", game.state.CurrentQuestion, "with", a.Number, "in", game.PIN)
+	log.Println(a.PlayerID, "answered option", a.Number, "in", atime.Sub(game.state.answersAt), "for question", game.state.CurrentQuestion+1, "in game", game.PIN)
 
 	game.state.Players[a.PlayerID-1].answer = a.Number
 	game.state.Players[a.PlayerID-1].answeredAt = atime
