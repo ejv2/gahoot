@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
+	"os/signal"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -141,6 +143,31 @@ func main() {
 		api.GET("/host/:pin", handleHostAPI)
 	}
 
-	err = srv.ListenAndServe()
-	log.Panic(err) // NOTREACHED: unless fatal error
+	errchan := make(chan error, 1)
+	sigchan := make(chan os.Signal, 1)
+
+	signal.Notify(sigchan, os.Interrupt)
+	go func() {
+		err := srv.ListenAndServe()
+		errchan <- err
+	}()
+
+	select {
+	case <-sigchan:
+		log.Println("Caught interrupt signal. Terminating gracefully...")
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		err := srv.Shutdown(ctx)
+		if err != nil {
+			if err == ctx.Err() {
+				log.Println("Shutdown timeout reached. Terminating forcefully...")
+				return
+			}
+			log.Fatal(err)
+		}
+	case err := <-errchan:
+		if err != http.ErrServerClosed {
+			log.Panic(err) // NOTREACHED: unless fatal error
+		}
+	}
 }
