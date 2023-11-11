@@ -6,8 +6,8 @@
  */
 
 // Endpoint locations
-export const PlayEndpoint = "ws://" + location.host + "/api/play/"
-export const HostEndpoint = "ws://" + location.host + "/api/host/"
+export const PlayEndpoint = ws_proto + "://" + location.host + "/api/play/"
+export const HostEndpoint = ws_proto + "://" + location.host + "/api/host/"
 
 // Common icon resource paths
 export const iconpath: string = "/static/assets/"

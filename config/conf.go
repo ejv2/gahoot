@@ -19,6 +19,7 @@ type Config struct {
 	ListenAddr     string   `validate:"ip_addr|hostname"`
 	ListenPort     uint64   `validate:"gte=1,lte=65535"`
 	TrustedProxies []string `validate:"dive,ip_addr"`
+	HasSSL         bool
 
 	QuizPath string `validate:"dir"`
 
@@ -29,6 +30,14 @@ type Config struct {
 // ListenAddr and ListenPort in the format expected by net.Dial.
 func (c Config) FullAddr() string {
 	return fmt.Sprintf("%s:%d", c.ListenAddr, c.ListenPort)
+}
+
+func (c Config) WSProto() string {
+	if c.HasSSL {
+		return "wss"
+	}
+
+	return "ws"
 }
 
 func New(path string, validator *validator.Validate) (Config, error) {
