@@ -105,6 +105,9 @@ func parse(c *Config, path string) error {
 		case "game_timeout":
 			i, e := strconv.ParseInt(trail, 10, 32)
 			c.GameTimeout, err = time.Second*time.Duration(i), e
+		case "ssl":
+			lc := strings.ToLower(trail)
+			c.HasSSL = (lc == "true" || lc == "yes")
 		default:
 			err = fmt.Errorf("unknown key: %q", key)
 		}
