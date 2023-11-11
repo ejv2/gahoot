@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -53,10 +52,6 @@ func main() {
 	if err := checkFrontend(); err != nil {
 		log.Fatal(err)
 	}
-
-	// Seed random
-	// MUST be done before game coordinator
-	rand.Seed(time.Now().UnixMilli())
 
 	// Init configs
 	vd = validator.New()
