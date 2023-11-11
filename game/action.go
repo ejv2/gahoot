@@ -346,7 +346,7 @@ func (a Answer) Perform(game *Game) {
 
 type SendResults struct{}
 
-func (s SendResults) Perform(game *Game) {
+func (s SendResults) Perform(_ *Game) {
 }
 
 // EndGame shuts down the game runner, thereby terminating the current
