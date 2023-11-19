@@ -1,0 +1,533 @@
+.TL
+Design Document: Gahoot
+.AU
+Ethan. J. Marshall
+.AI
+June 2022
+
+.AB
+This is the official design document for
+.I "Gahoot" ","
+a project designed to re-create the original Kahoot! game in a manor which
+allows for self-hosting, distributed play and incorporating a high degree of
+personal configurability into the game. The project is authored entirely in pure
+Go on the backend and TypeScript utilising AlpineJS on the frontend.
+.AE
+
+.NH
+Introduction
+.PP
+.I "Gahoot"
+is a rewrite of the classic educational game "Kahoot!", rewritten from scratch
+using a technical stack consisting of Golang, TypeScript and the minimal amount
+of external technologies. A small JavaScript framework (known as Apline.js) is
+used to handle the dynamic updates of the DOM upon the reception of remote
+events and websockets are used to orchestrate these remote events across the
+server-client boundary.
+.PP
+In this design document, details about the implementation and design of Gahoot
+and its subsystems are outlined. This document was first authored in summer of
+2022 and has been used as a working document ever since. The final draft was
+cimpleted in winter of 2023.
+
+.NH
+Configuration
+.PP
+The Gahoot configuration system is designed to allow for simplistic, plain UTF-8
+encoded text to be easily specified for use in the system. The configuration
+system closely follows the philosophy that errors ought to be caught and
+reported early. Additionally, it is crucial that the zero-value for the
+configuration still be valid. For this reason, the default behaviour for several
+of the fields are contrary to first instincts. For example, if the game timeout
+field is left blank (or set to zero manually), no game timeout is enforced at
+all. This is much more sensible than enforcing a timeout of zero seconds to each
+game. This also means that, in the event of a bad configuration for any reason,
+the server will not be entirely thrown off. The absence of an auxiliary
+configuration key should not be cause for full server failure. This is a key
+design difference to other projects of mine, such as DSJAS, in which the absence
+of certain config keys would make parts of the site inoperable.
+.NH 2
+Parser
+.PP
+The configuration file parser has several small details which ought to be
+mentioned. To start with, the parser will summarily reject any configuration
+which contains unknown keys. Originally, the configuration parser would simply
+ignore any such keys and continue to load the configuration. This caused major
+issues in the case of small typos or difficult to spot errors. It also made
+configurations which could plausibly be valid but used subtly different naming
+schemes or conventions (for instance, "address" rather than "addr" for the
+server binding address) difficult to spot. In light of this, I chose to cause
+the parser to simply reject any keys which were not known.
+.PP
+Errors thrown by the parser are collected and accumulated in an error value
+which is a wrapper over a slice of other errors. This allows the parser to
+continue to attempt to parse the full file and return any subsequent errors
+which are returned. As part of this approach, a grammar which preserves global
+consistency even in the case of local inconsistency was required. For this
+reason, certain restrictions are placed on the usage of whitespace. This means
+that the parser can easily detect a config file with both misplaced array
+brackets and errors further into the file. Contrast this with a language such as
+C, Python or even Go itself, in which the grammars make it impossible to detect
+further errors after, for instance, a misplaced bracket has made the rest of the
+file impossible to disambiguate.
+.PP
+The implementation of arrays in the configuration language was slightly
+inelegant due to their addition to the design later on. The parser supports two
+types of array literal: empty and populated. An empty array consists of the
+literal character string "[]" and is interpreted as the equivalent of an empty
+Go slice for the corresponding key. Populated arrays must consist of an opening
+bracket on the same line as the key (this is required to declare to the parser
+that multiple values are incoming). This must then be followed by at least one
+value on a new line, before a final closing brace on its own line. The final
+closing brace is strictly required on its own line for reasons of local
+consistency as mentioned earlier. This means that a missing closing brace can be
+narrowed down to a specific line which may be rejected. Blank lines are not
+permitted in populated array bodies. The parser only attempts to parse an array
+when one is expected in the config, so no disambiguation is required between a
+key with the literal text "[]" and an empty array literal of the same type.
+.PP
+Comments in the configuration file were implemented for two reasons. First, I
+wanted the sample configuration to serve as its own documentation. Secondly,
+their implementation was so simple to do that I thought it was probably worth
+the two extra lines of code.
+.NH 2
+Validation
+.PP
+After a successful parse pass over the config file, each value is validated in
+turn before returning to the caller. This is done such that there is no point in
+the Gahoot program in which an invalid configuration file is loaded and
+unverified.
+
+.NH
+Quiz System
+.PP
+The Gahoot quiz system was designed with remote replication in mind. The main
+idea is that different users, game servers and quiz authors should be able to
+share around a specific quiz file and be confident that this specific quiz is
+the one that was requested or stored. Additionally, quiz files themselves are
+designed as "atoms", such that all that is required to pass around a quiz from
+user to user is simply the quiz file itself.
+.NH 2
+Quiz Files
+.PP
+Quiz files are simply JSON-encoded dumps of the Quiz struct as seen by Gahoot.
+Every quiz file has an associated SHA-256 hash which uniquely identifies this
+specific quiz archive to all users and servers. This quiz archive contains some
+basic metadata (such as the quiz title and author) and then an array of all
+questions in the quiz.
+.PP
+Keeping in the spirit of the quiz archive being atomic, questions may not
+reference any external data which may not be immediately fetched using only the
+data in the archive. As such, the images associated with questions must be
+fetched from an external source via a supplied URL. The security implications of
+this were discussed frequently. Eventually, a compromise was settled. It shall
+be configurable as to whether a specific Gahoot server will supply its players
+with the image URLs to download onto the client. This makes it much more
+difficult for a malicious quiz to perform tasks such as IP logging. Even when
+images are enabled, the server will first perform a test HTTP request to check
+that the returned data has the correct encoding and MIME type. Although this is
+not a bulletproof approach to catching invalid image URLs, it should deter
+anything less than the more serious attacker.
+.PP
+For every question, the required metadata for the actual gameplay is also
+supplied, such as the question's actual problem statement and the duration for
+which the question will last. Up to four given answers are then supplied, for
+which at least one must be marked as correct.
+.NH 2
+Quiz Hashes
+.PP
+As mentioned earlier, every quiz in circulation has a unique hash associated
+with it, which is calculated using the SHA-256 algorithm. This algorithm was
+chosen as high hashing performance of potentially large archive files is
+an imperative. As such, cryptographic-grade security was traded for performance
+with the choice of such an old algorithm. This is a similar choice made in
+version control systems such as Git. The SHA-256 algorithm outputs 256 bits of
+one-to-one mapped bits with a quiz archive. This is a potential source of
+problems, as a single changed bit in the archive leads to an entirely different
+and indistinguishable hash value. To combat some potential problems early, a
+preprocessing algorithm is first performed on all quiz archives before hashing.
+For starters, all formatting is removed (to avoid issues with line endings and
+from menial changes which do not impact actual gameplay leading to a different
+archive hash). Then, all fields which were not supplied in the original archive
+text are added with the zero value as a value. This means that the entire
+structure of every struct involved in the quiz archive's makeup is mirrored in
+the archive file. Both these tasks are achieved by running the input source
+archive text through a reliable, stable algorithm server-side - namely, the Go
+standard library's encoding/json Marshal and Unmarshal routines. First, the
+input text is Unmarshalled into a Question struct. It is then Marshalled back
+into textual form with no formatting. This means that, given no major changes to
+the Go standard library, any input quiz archive which plays the same and has the
+same metadata shall hash to the exact same hash value.
+.PP
+This choice of steps was chosen to avoid certain attacks where the same quiz
+with changes to things outside the scope of play (such as indents to lines or
+formatting of the JSON grammar) allow for a totally different hash.
+.PP
+The emphasis on the reliability of the hash values allows them to be used for
+various tasks inside of the Gahoot system. For instance, searches can be
+performed by hash; quizzes are stored in a hash map against textual hash values;
+and quiz archives may be propagated securely between servers (as the algorithm
+should ensure that the same value will be calculated on both ends of the
+transfer).
+.NH 2
+Hashing Culture
+.PP
+The design of the hashing system aims to create a culture among players similar
+to those in the PGP community: check all metadata but also check hashes
+carefully. As it is very difficult and CPU intensive to create spoof quiz
+archives which have the same metadata and similar looking hashes, it is fairly
+reliable to simply check for a quiz which has the metadata you are looking for
+as well as a few digits of the has matching. As such, it is expected that
+players will simply verify, say, the first five digits of the hash. As such,
+several aspects of Gahoot's design lean in to this idea. For instance, searches
+optimized for finding hashes by the first portion of their hash and the
+emboldening of this first portion in several sections of the UI.
+.PP
+All of this is to encourage users to verify that they do, in fact, have the
+original file that they want by checking hashes. A possible improvement on this
+system could be to create an algorithm which generates mnemonic, word-based hash
+encodings. This is being trialled on the UK postage system, in which post codes
+can be replaced with three systematically chosen words which encode the original
+post code but are much easier for humans to remember.
+.NH 2
+Maximum Quiz Size
+.PP
+A maximum file size limit is imposed on quiz archives of 8 MB. This was
+calculated based on how many questions may be permitted at that file size. At a
+small paragraph of text per question, it would still take multiple thousands of
+questions before the file size limit was reached.
+.PP
+The rationale behind this imposed limit was to avoid attacks on game servers in
+which unreasonably large quiz archives were uploaded. This was a particularly
+nasty attack vector on Gahoot servers for two reasons.
+.PP
+Firstly, the Gahoot server expends a non-trivial amount of CPU time on
+calculating a quiz archive hash for incoming quiz sources. This involves the
+three step process mentioned above (each step involving heavy use of runtime
+reflection). The calculation of the hash then scales linearly with the size of
+the input, meaning that immensely large quiz archives texts lead to unreasonably
+CPU load on the server.
+.PP
+Secondly, the Gahoot server will store the decoded resulting Quiz struct for the
+lifetime of the server in its internal quiz library (see the Quiz manager later
+on). This means that, without a maximum quiz size limit imposed, an unbounded
+amount of memory could be forced to be allocated by an attacker, potentially
+causing severe disruption to others' ongoing games, or even a potential server
+crash. In Go, failure to allocate memory results in unconditional process
+abortion, so avoiding an OOM-scenario is critical to long-running networked
+software.
+.PP
+It is important to note that the file size limitation is actually placed on the
+original archive source text. This means that, for a given quiz, significantly
+less than 8 MB of memory will likely be used by a stored quiz once decoded. This
+is due to the more compact binary representation in memory (a 4 byte integer
+could be as much as 10 bytes when encoded as text) as well as the lack of JSON
+grammar details (such as parentheses and quotes).
+
+.NH
+Quiz Manager System
+.PP
+As mentioned earlier, one of the key goals of Gahoot was to allow distributed
+play. Essentially, if I, an Englishman on one side of the world, were to upload
+a quiz to play to a file share or Gahoot server here in Europe, a Russian on the
+other side of the world could potentially download the quiz archive from my
+server and be confident he has the same quiz as I had. Even better, this process
+could be performed automatically. The achievement of this goal was dependent
+partially upon the hashing algorithm outlined above, but also upon the
+networking system of Gahoot servers and their storage methods of quizzes.
+.PP
+Essentially, all Gahoot servers permit the upload of arbitrary quizzes from
+their users. The server is then eager to hoard as many of these quizzes as it
+can with no duplicates allowing us to keep a sort of library store of all
+quizzes which pass through our server. This is a useful property as it means
+that more popular servers would naturally act as a sort of repository for quiz
+archive files without users having to manually share files. The hashing system
+then ensures that no duplicates or mistakenly identified quizzes can be supplied
+to the server. This system mirrors the Web of Trust system employed by PGP quite
+closely (simply substituting the key fingerprint for the quiz archive hash
+outlined above).
+.PP
+For every Gahoot server, there will be one instance of a quiz manager. The quiz
+manager is a map between the stringified hash values for a given quiz. These
+stored quizzes are then stored indefinitely until a memory of storage
+requirement forces the server to perform garbage collection over stored quizzes.
+At startup, the server will check if there are any quizzes stored persistently
+on the filesystem which could be potentially loaded. If there are any, they are
+parsed and loaded into memory to be made available to clients.
+.NH 2
+Replication
+.PP
+Part of the networking system for Gahoot is the quiz replication system. This
+allows different Gahoot servers to communicate to share their collective pool of
+Quizzes. Each server may have zero or more "friend" servers configured which the
+server will trust to supply it with an index of what quizzes are available to it
+in its quiz store. If a quiz with the required hash is returned as present from
+a friend server, it will have its text returned for parsing. Although it was
+implied earlier that friend servers must be trusted by a Gahoot server, this is
+not necessarily the case. A server merely need be moderately popular with users
+in order to be an effective friend. As the inquiring game server will perform
+hash checking of its own, there is no risk of malicious friend servers causing
+quiz database corruption through faulty or malicious hash calculation.
+.PP
+Queries for quiz archives are performed in a pseudorandom order over the friend
+servers. This is done to avoid particularly high load on popular friend servers,
+spreading the load over smaller servers. Random integer indices into the friends
+array are picked until a server which hasn't been queries yet is selected. This
+process continues until either a server has returned a valid affirmative
+response or all friends have been queried. If a valid affirmative is returned,
+the archive is downloaded from the server and stored non-persistently in the
+inquiring server's quiz store. This means that the inquiring server may now
+return in the affirmative when queried about its own quiz store for this
+particular hash. This process is modelled after DNS.
+.PP
+Given the algorithm outlined above, it is clear why it is advantageous to have a
+large list of configured friend servers (even those owned by individuals you may
+not necessarily trust); the greater the number of friend servers configured, the
+greater the chance your server will locate a quiz which it does not have direct
+access to at that moment.
+.PP
+Administrators may configure their server to periodically dump all replicated
+quiz archives to disk to avoid having to crawl all friend servers for the
+archive again. This is a configurable setting as it possibly opens the door for
+very large disk usage if many quizzes are requested by players.
+.NH 2
+Sanctuary Servers
+.PP
+It is expected that, given this design, some servers will eventually become
+hubs, where many other game servers have them configured as friends but they
+themselves have few friends. These servers are very dependable due to their
+popularity but may become lesser than optimally run if permitted to host games
+at the same time. This is the motivation behind "Sanctuary Mode", in which a
+server may act as a quiz storage server without the overhead of actually having
+to host games. Requests for the quiz index may be accepted, but all other
+requests will redirect to a randomly chosen other server from the server's
+handoff list, which is configured by the administrator to be other reputable
+servers which are not in sanctuary mode.
+.PP
+Sanctuary mode should not really be enabled on servers unless absolutely
+intolerable load begins to be placed on the server by players. This setting is
+not just there to save server owners bandwidth or CPU time; it is designed for
+the good of all those who depend on a certain server for quality quiz storage.
+.PP
+Sanctuary mode also enables some certain cost-cutting measures to ensure that
+large storage servers do not become bogged down with load. In particular,
+enabling sanctuary mode makes storage backed quiz managers mandatory (meaning
+that quizzes will be stored to disk after a certain amount of time regardless of
+the administrator's configuration of this behaviour).
+
+.NH
+Websocket and Communications
+.PP
+A cursory glance over the Gahoot source code will reveal heavy usage of
+websockets for real-time communication. These socket connections are used for
+the delivery of events and data across the server-client boundary and provide a
+method of mass orchestration of clients. In addition, from the provisions of the
+websocket specification, detection of disconnected or dropped clients is easily
+provided.
+.NH 2
+Architecture
+.PP
+Gahoot's websocket architecture is conceptually very simple. For every websocket
+connection, one runner goroutine is created to manage I/O buffering and periodic
+PING(s) (read on). This architecture ensure the automatic management of multiple
+writers to a single websocket connection. Although this situation rarely occurs
+in Gahoot's architecture, when it does, it is highly likely to be under heavy
+thread contention. This is why the runner goroutine is used. Instead of forcing
+many routines to block on a potentially very latent network connection, they
+instead merely block upon an I/O buffer managed by a dedicated goroutine. The
+only situation in which routines are forced to block waiting for websocket I/O
+is in the case of a PING (again, read on).
+.NH 3
+Direction of Control
+.PP
+The direction of control is always from server to client. The client may only
+post messages which the server has explicitly permitted the posting of and every
+action of the client must be considered warranted on the part of the server.
+Whereas the client ignores any unknown or unexpected messages received from the
+server, the server will terminate any clients upon reception of any unexpected
+chatter. This is to avoid rogue clients attempting things on the server and to
+kick out malfunctioning clients early before havoc may be caused.
+.NH 3
+Structure of Packets
+.PP
+The structure of a packet is always textual (binary packets are implicitly
+dropped client side and cause termination server side). Messages are formatted
+as a verb and a body. The verb is always UTF-8 text separated from the body by a
+single ASCII space character. The body is any valid UTF-8 text decoded at the
+client's discretion. The body is defined as beginning from the first character
+after the first ASCII space character in a websocket payload up to and including
+the end of the message.
+.PP
+The structure of packets is identical regardless of communication direction,
+although the server is much more conservative about which inputs and messages it
+accepts and when.
+.NH 3
+Packet Acknowledgement and Two-Way Communication
+.PP
+For the most important messages in Gahoot, an acknowledgement packet is required
+before more valid messages can be received. Failure to do so results in
+termination. No timeouts are imposed on acknowledgement packets as the PING
+system will catch unresponsive clients anyway.
+.PP
+Two-way communication is achieved with a call and response structure, in which
+certain messages provoke a response from the client. Most do not, however, and
+are simply one-way instructions to the client. When an instruction is deployed
+which expects a response back, a state machine is used to ensure that state is
+consistently preserved. Outside of a PING being sent, there is no transaction
+which cannot be atomically performed using this method and so this is how data
+is read back from the client. However, due to the expensive nature of the
+requirement to lock up the runner goroutine, atomic transactions with the client
+are rare in the Gahoot source code and the client acts as an open loop system
+the majority of the time.
+.NH 2
+Disconnect Detection
+.PP
+By the provisions of the websocket standard, a disconnect detection may only be
+performed on the sending of a message. Unfortunately, the frequency at which
+messages are sent in Gahoot does not provide a satisfactory way of detecting
+abrupt disconnects from the server, especially those which occur in a way which
+is counter to the standard (i.e: without a disconnect packet being sent). The
+solution to this is the PING system. The PING system is started on the starting
+of the connection runner goroutine. A PING message will be sent periodically to
+the client with a pseudorandom sequence number as the body and "PING" as the
+verb. The client has up to 10 seconds to respond with a message with the verb
+"PONG" and the sequence number incremented by one. If this does not occur, the
+server assumes a dead or malfunctioning client and terminates the client.
+.PP
+When a client disconnects from a game via this method, there is still an
+opportunity for it to re-connect without losing progress by simply attempting to
+assume control of the same player ID. See the design of the game system for
+more details.
+.NH 2
+Message Interpretation
+.PP
+The standard client for each websocket connection is packaged as a minimal
+struct in package game. These are then embedded in other structs which use them
+as base classes for their own interpretation of the socket. The encapsulating
+struct is considered the master of the connection and may reconfigure or tear it
+down without notice.
+
+.NH
+Game System
+.PP
+At any one time, a Gahoot server may be the host to zero or more ongoing games.
+These games are multiplexed over by a game-runner for each ongoing game. This
+game runner goroutine lasts for the lifetime of the game and is responsible for
+handling all requests and actions submitted (read on).
+.PP
+.B Note:
+This section will not deal with the specific game design sections of the
+program, as most of these are done without motivation and are simply designed to
+mime that which is done upstream by Kahoot! themselves.
+.NH 2
+Game PINs
+.PP
+Every game has a unique PIN associated with it. These are designed to allow for
+a natural maximum of two to the twenty-third power games ongoing, which is the
+maximum number of games which can have a 32-bit PIN. This value fits happily
+into a 10-digit integer. It is not quite true that two to the twenty-third power
+games can be ongoing at once, however, as a lower bound is placed on game PINs
+for simplicity: the PIN may not be less than 1111111111 (ten 1s). This is to
+avoid confusion around if the zeroes need be entered or not (they would need to
+be, but that is inconsequential due to this feature). PINs are pseudorandomly
+generated until one is found which is not yet taken, blocking until this occurs.
+Hopefully, the probabilities will work out such that blocking on PIN generation
+is exceedingly rare.
+.NH 2
+Maximum Game Time
+.PP
+To avoid an attack on game servers in which a deliberate memory leak of the game
+runner goroutine is caused, a maximum game time is placed on ongoing games. The
+value of this maximum time is configurable to the administrator, depending on
+how high their load is and how paranoid they are.
+.NH 2
+Game Runner
+.PP
+The game runner only has two tasks: to wait for the game to end and to wait for
+incoming events.
+.PP
+When the game ends, the game's context is cancelled which causes all child
+goroutines (which have contexts derived from the game's main context) to
+terminate at their earliest convenience. This is important as it means that,
+once a game is over, nothing of it remains. Games should be side-effect free for
+the rest of the program.
+.PP
+When an incoming event is received, the game runner calls its Perform method.
+This is part of an interface which allow for thread synchronised code to be
+called on the game runner goroutine without error-prone locking or deadlocks.
+This is performed by sending the interface over a channel and executing it in a
+context where it has exclusive control over the game's internal data.
+.PP
+One additional system executes in parallel which is simply there to allow for
+currently ongoing games to be queried. This is the request system, which returns
+a read-only copy of the game's internal data fields (encapsulated in a struct
+called State).
+.PP
+The runner follows a state machine defined by state functions, which define what
+state the machine will transfer to and any conditions in transferring state.
+These state functions are executed upon each iteration of the game runner's
+mainloop. This mainloop simply consists of selecting over all the channels
+contained within the game (including the context's done channel).
+.PP
+The game runner spends most of its lifetime blocking on channels. When it isn't
+doing that, it will be executing event action handlers.
+.NH 2
+Game Termination
+.PP
+A problems exists as of yet for this design: when the game exits, the game
+runner exits with it. However, this means that the only exclusive controller of
+all the game data will be gone making the game data unreachable safely. The
+consequence of this is that the game coordinator (which stores games in a map
+between PINs and game objects) can never know when games have finished and
+delete them from the game map. This violates our previous desire that games
+terminating should leave behind no side effects on the wider program. The
+solution to this is the game reaper.
+.PP
+On termination, the game will send its own PIN over a channel configured for it
+called the reaper channel. The game coordinator will then receive this PIN over
+the reaper channel it configured and remove the given game from the game map.
+This interaction is all automatically synchronised by the channel semantics.
+
+.NH
+Build System
+.PP
+A glance at the Git logs will reveal that, until recently, the project required
+a rather heavy set of NPM dependencies to build. This was a problem for me, as I
+needed to build and deploy on some pretty weak hardware, such as the Raspberry
+Pi. As of this day, I still host a small, self-updating test instance for the
+school computer science department on a little Raspberry Pi.
+.PP
+My solution to the problems of very heavy NPM builds was to simply eliminate
+them entirely. The most expensive part of the process by far (at least for the
+frontend) was packing. Essentially, taking the packages from NPM and placing
+them into a CommonJS-compatible format and placing them in the correct location
+for sending to the client. Initially, I used Snowpack, as it could be configured
+to do exactly what I wanted without fuss or extra steps. This, however, still
+proved too much, so I decided to rewrite this part of the system. As of now, the
+process simply relies upon POSIX shell scripts to do the task instead, which
+they do in a fraction of the time with much lower CPU usage. Basically, the
+script "pack" just takes all node modules which are required and copies them to
+CommonJS modules, rewriting imports with regular expressions as it does so.
+
+.NH
+Summary and Reflection
+.PP
+In summary, Gahoot is a functional rewrite of Kahoot! in Go with several unique
+features geared toward distribution of user-authored quiz archives. I think that
+the replication features are definitely the most unique part of the design and
+what which I am most proud of.
+.PP
+If I were to change something about my design, I would attempt to reduce
+complexity on the frontend by using plain JavaScript and avoiding the use of a
+framework entirely. In retrospect, the complexity it avoids by automatically
+rewriting the DOM where required is not worth the traded complexity in the build
+process and writing process. This complexity could easily have been abstracted
+by functions on the client.
+.PP
+Additionally, the synchronisation model on the client can be difficult to reason
+about (for instance, once a state function executes, we are already in that
+current state, which led to bugs and silly mistakes). There are still a couple
+of known issues with race conditions on the client and fixing existing ones
+proved very difficult and added a great deal of complexity to the codebase.
+.PP
+However, in general, I believe Gahoot to be a success.

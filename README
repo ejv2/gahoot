@@ -18,6 +18,8 @@ There is a design document that I wrote in "DESIGN". It is formatted in GROFF MS
 groff -ms -Tpdf DESIGN | zathura -
 ```
 
+Some parts might sound a bit academic (and some never made it into the final project on hand-in date), so if you get confused just skip over the section.
+
 If the above doesn't work for you or if you are really having trouble compiling the design document, just email me (see committer email) and I'll be happy to email you a PDF or PostScript copy.
 
 ## Building
