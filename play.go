@@ -16,9 +16,10 @@ import (
 // UI.
 func handleHost(c *gin.Context) {
 	dat := struct {
-		Title string
-		Pin   uint32
-	}{}
+		Title          string
+		Pin            uint32
+		WebsocketProto string
+	}{WebsocketProto: Config.WSProto()}
 
 	spin := c.Param("pin")
 	if spin == "" {
@@ -56,9 +57,10 @@ func handleHost(c *gin.Context) {
 func handleGame(c *gin.Context) {
 	dat := struct {
 		// NOTE: Must be uint32, as game.GamePin is formatted as a JS string
-		Pin uint32
-		UID int
-	}{}
+		Pin            uint32
+		UID            int
+		WebsocketProto string
+	}{WebsocketProto: Config.WSProto()}
 
 	id, pin := c.Param("pin"), game.Pin(0)
 	uid, intuid := c.Query("plr"), int(0)
