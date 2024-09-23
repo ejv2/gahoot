@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"net/url"
 	"time"
 )
 
@@ -41,7 +40,7 @@ type Answer struct {
 type Question struct {
 	Title    string   `json:"title"`
 	Duration int      `json:"time"`
-	ImageURL *url.URL `json:"image_url"`
+	ImageURL *string  `json:"image_url"`
 	Answers  []Answer `json:"answers"`
 }
 
