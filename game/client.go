@@ -134,7 +134,7 @@ func (c Client) SendMessage(verb string, body interface{}) {
 func (c Client) Open() {
 	c.lastPong = time.Now()
 	c.conn.SetReadDeadline(c.lastPong.Add(PongInterval).Add(PongTimeout))
-	c.conn.SetPongHandler(func(appData string) error {
+	c.conn.SetPongHandler(func(_ string) error {
 		latency := time.Now().Add(-PongInterval).Sub(c.lastPong)
 		if latency < 0 {
 			latency = 0 - latency
