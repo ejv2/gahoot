@@ -27,7 +27,7 @@ enum States {
 
 interface QuestionData {
     title: string
-    image?: string
+    image_url?: string
     time: number
     answers: {
         title: string
@@ -94,7 +94,7 @@ class HostState {
         this.icons = common.icons
         this.question = {
             title: "Error!",
-            image: "https://developer.valvesoftware.com/w/images/5/5b/Missing_textures_example.png",
+            image_url: "https://developer.valvesoftware.com/w/images/5/5b/Missing_textures_example.png",
             time: 10,
             answers: [],
             index: 1,

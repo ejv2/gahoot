@@ -26,7 +26,7 @@
 			</template>
 
 			<button class="btn btn-blue" @click="$store.host.startGame()">Start game</button>
-			<p x-show="startError" class="error"><u>Three</u> players required to start</p>
+			<p x-show="startError" class="lighterror"><u>Three</u> players required to start</p>
 		</div>
 
 		<!-- Game start countdown -->
@@ -45,17 +45,20 @@
 		<!-- Question answer options -->
 		<div id="answers" x-show="stateID == 4" class="game-container">
 			<div class="game-answers-title">
-				<h1 x-text="$store.host.question.title"></h1>
-				<div>
-					<a @click="$store.host.skip()">Skip</a>
-					<span x-text="$store.host.questionCountdown"></span>
+				<div class="game-answers-title-block">
+					<img class="game-answers-title-image" x-show="$store.host.question.image_url != null" :src="$store.host.question.image_url" />
+					<h1 class="game-answers-title-text" x-text="$store.host.question.title"></h1>
+				</div>
+				<div class="game-answers-title-actions">
+					<a class="btn" @click="$store.host.skip()">Skip</a>
+					<span class="game-answers-timer" x-text="$store.host.questionCountdown"></span>
 				</div>
 			</div>
 			<div class="game-answers">
 				<template x-for="(ans, i) in $store.host.question.answers">
 					<div class="game-answer">
 						<img :src="$store.host.icons[i]" />
-						<p class="game-answer-text" x-text="ans.title" />
+						<h2 class="game-answer-text" x-text="ans.title" />
 					</div>
 				</template>
 			</div>
