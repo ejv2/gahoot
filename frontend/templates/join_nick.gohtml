@@ -11,8 +11,12 @@
 		<form class="wizard-box wizard-box-vertical">
 			<input type="number" name="pin" value="{{.Pin}}" hidden></input>
 
-			<input type="text" max=20 placeholder="Nickname" name="nick" required></input>
+			<input {{if .JoinError}}class="error"{{end}} type="text" max=20 placeholder="Nickname" name="nick" required></input>
+			{{if .JoinError -}}
+				<p class="error">Nickname already in use</p>
+			{{- end}}
 			<input class="btn btn-dark" type="submit"></input>
+
 		</form>
 
 		<footer class="wizard-footer">

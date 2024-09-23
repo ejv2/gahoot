@@ -66,12 +66,23 @@ func (c ConnectHost) Perform(game *Game) {
 // AddPlayer allocates a new slot on the server for one player to join and
 // returns an ID for this player, which is the index into the players array.
 // This ID will then be used by the websocket to request to join the game.
+// If Err is non-nil, the player will not have been added and ID will be
+// negative, which is invalid.
 type AddPlayer struct {
 	Nick string
 	ID   chan int
 }
 
 func (p AddPlayer) Perform(game *Game) {
+	if game.state.namecache == nil {
+		game.state.namecache = make(map[string]struct{})
+	}
+	if _, ok := game.state.namecache[p.Nick]; ok {
+		log.Println("reserved nick", p.Nick, "attempted re-add: rejected")
+		p.ID <- -1
+		return
+	}
+
 	// NOTE: Deliberately does not start the player context.
 	// Runner has not yet started and the context must be re-created on
 	// re-connection
@@ -83,6 +94,7 @@ func (p AddPlayer) Perform(game *Game) {
 			send:      make(chan string),
 		},
 	})
+	game.state.namecache[p.Nick] = struct{}{}
 
 	p.ID <- len(game.state.Players)
 }

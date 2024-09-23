@@ -28,6 +28,7 @@ func handleJoin(c *gin.Context) {
 		Pin        game.Pin
 		PinValid   bool
 		PinPresent bool
+		JoinError  bool
 	}{}
 	// Aliases for landing pages.
 	joinPin := func() {
@@ -70,9 +71,19 @@ func handleJoin(c *gin.Context) {
 			g.Action <- act
 			id := int64(<-act.ID)
 
+			// Error signalled. Fail the join request.
+			if id < 0 {
+				c.Redirect(http.StatusSeeOther, "/join?pin="+strconv.FormatUint(uint64(dat.Pin), 10)+"&error=duplicate")
+				return
+			}
+
 			c.Redirect(http.StatusSeeOther,
 				"/play/game/"+p+"?plr="+strconv.FormatInt(id, 10))
 			return
+		}
+
+		if e := c.Query("error"); e != "" {
+			dat.JoinError = true
 		}
 
 		joinNick()

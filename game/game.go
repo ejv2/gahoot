@@ -49,6 +49,9 @@ type State struct {
 	Players         []Player
 	CurrentQuestion int
 
+	// Caches the used names in the current game.
+	namecache map[string]struct{}
+
 	// Has the host completed the countdown?
 	countdownDone bool
 	// Curently in answer time?
