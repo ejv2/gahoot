@@ -86,7 +86,7 @@ class PlayerState {
 
         this.question = {
             title: "Error!",
-            image: "https://developer.valvesoftware.com/w/images/5/5b/Missing_textures_example.png",
+            image: "https://developer.valvesoftware.com/w/images/8/8b/Debugempty.png",
             answers: [
                 "1",
                 "2",
