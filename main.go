@@ -70,7 +70,7 @@ func main() {
 	if err != nil {
 		if warns, ok := err.(quiz.LoadDirError); ok {
 			for _, elem := range warns {
-				log.Println("WARNING: loading quiz store:", elem)
+				log.Println("WARNING:", elem)
 			}
 		} else {
 			log.Fatal("error loading quiz store:", err)

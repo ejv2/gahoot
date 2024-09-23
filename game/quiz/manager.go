@@ -11,6 +11,25 @@ import (
 	"unicode"
 )
 
+// quizLoadDirError is one of the error types which we create when a quiz file
+// load fails. It is the error type which will be listed under LoadDirError.
+type quizLoadDirError struct {
+	File string
+	Orig error
+}
+
+// Error returns the stringified representation of this load error, which
+// contains the original error and the filename to cause it.
+func (q quizLoadDirError) Error() string {
+	return fmt.Sprint("load ", q.File, ": ", q.Orig.Error())
+}
+
+// Unwrap returns the original error which this error wraps, for use in
+// errors.Unwrap or errors.Is, for example.
+func (q quizLoadDirError) Unwrap() error {
+	return q.Orig
+}
+
 // LoadDirError is the error returned for non-fatal errors during crawling a
 // directory. To prevent errors in a single file prevent all other files being
 // loaded, the process is not stopped unless an error which makes it impossible
@@ -127,18 +146,18 @@ func (m *Manager) LoadDir(path string) ([]Quiz, error) {
 
 		f, err := os.Open(full)
 		if err != nil {
-			errs = append(errs, err)
+			errs = append(errs, quizLoadDirError{elem.Name(), err})
 			continue
 		}
 
 		q, err := LoadQuiz(f, SourceFilesystem)
 		if err != nil {
-			errs = append(errs, err)
+			errs = append(errs, quizLoadDirError{elem.Name(), err})
 			continue
 		}
 		err = m.load(q)
 		if err != nil {
-			errs = append(errs, err)
+			errs = append(errs, quizLoadDirError{elem.Name(), err})
 			continue
 		}
 
