@@ -21,6 +21,8 @@ type Config struct {
 	TrustedProxies []string `validate:"dive,ip_addr"`
 	HasSSL         bool
 
+	SiteLink string `validate:"url"`
+
 	QuizPath string `validate:"dir"`
 
 	GameTimeout time.Duration

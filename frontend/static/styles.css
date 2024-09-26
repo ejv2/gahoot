@@ -88,12 +88,23 @@ input[type=submit] {
         transform: scale(1, 0.8);
 }
 
+.btn:disabled {
+        opacity: 70%;
+        text-decoration: line-through;
+        cursor: not-allowed;
+        pointer-events: none;
+}
+
 .btn-green {
         background-color: var(--green);
 }
 
 .btn-dark {
         background-color: var(--dark);
+}
+
+.btn-purple {
+        background-color: var(--purple);
 }
 
 .wizard {
@@ -305,13 +316,160 @@ input.error {
         align-items: center;
 }
 
+p.starterror {
+        font-weight: bold;
+        font-size: 30pt;
+}
+
+.game-start-container {
+        justify-content: flex-start !important;
+}
+
+.gamepin-container {
+        min-width: 100%;
+        padding: 0px;
+
+        color: var(--dark);
+        background-color: var(--lightblue);
+}
+
+.gameaction-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        min-width: 100%;
+        padding: 0px;
+
+        background-color: var(--teal);
+        border-bottom: solid white 2px;
+        border-top: solid white 2px;
+}
+
+.gamepin-instructions {
+        display: inline-block;
+        font-weight: bold;
+        background-color: white;
+
+        font-size: 30px;
+
+        padding: 3px;
+        margin-left: 30px;
+
+        border-radius: 3px;
+}
+
+.gamepin-withthe {
+        display: inline-block;
+        font-weight: bold;
+        background-color: white;
+
+        font-size: 30px;
+
+        padding: 3px;
+        margin-left: 30px;
+        margin-bottom: 0px;
+        margin-top: 0px;
+
+        border-radius: 3px;
+}
+
+.gamepin {
+        display: inline-block;
+        background-color: white;
+        color: var(--dark);
+        font-weight: bolder;
+        font-size: 72pt;
+
+        margin-left: 50px;
+        margin-top: 0px;
+
+        width: auto;
+
+        border-radius: 3px;
+}
+
+.player-counter {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+
+        margin-left: 20px;
+}
+
+.player-counter-number {
+        background-color: white;
+        color: var(--dark);
+        padding: 4px;
+
+        font-size: 30px;
+        border-radius: 5px;
+
+        margin-bottom: 0px;
+}
+
+.player-joins {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 70px;
+        margin-top: 10px;
+}
+
 .game-countdown {
         background-color: var(--lightblue);
 }
 
 .host-nicknames {
+        font-size: 17pt;
+        animation: nickjoin-animation ease-out .3s;
         font-weight: bold;
         cursor: pointer;
+}
+
+@keyframes nickjoin-animation {
+        from {
+                transform: scale(0);
+        }
+
+        50% {
+                transform: scale(2);
+        }
+
+        to {
+                transform: scale(1);
+        }
+}
+
+@keyframes nickdisconn-animation {
+        from {
+                transform: scale(1) rotate(0deg);
+        }
+
+        10% {
+                transform: scale(1.5);
+        }
+
+        25% {
+                transform: scale(1.5) rotate(45deg);
+        }
+
+        50% {
+                transform: scale(1.5) rotate(-45deg);
+        }
+
+        75% {
+                transform: scale(1.5) rotate(45deg);
+        }
+
+        90% {
+                transform: scale(1.5);
+        }
+
+        to {
+                transform: scale(1) rotate(0deg);
+        }
 }
 
 .host-nicknames:hover {
@@ -321,6 +479,7 @@ input.error {
 .host-nicknames-disconnected {
         color: var(--red);
         text-decoration: line-through;
+        animation: nickdisconn-animation ease 1s;
 }
 
 .game-answers-title {

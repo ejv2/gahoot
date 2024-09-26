@@ -29,5 +29,8 @@ ssl: false
 // Can be relative (to cwd at startup), or absolute.
 quiz_dir: quizzes
 
+// Address to send players to (displayed cosmetically, not used for links)
+site_link: https://ejv2.cc/gahoot/
+
 // Gameplay settings
 game_timeout: 2700

@@ -17,16 +17,33 @@
 
 	<body x-cloak x-init="$store.host.init()" x-data="$store.host">
 		<!-- Player join screen -->
-		<div id="player-joins" x-show="stateID == 1" class="game-container">
-			<template x-for="player in players">
-				<p class="host-nicknames"
-					@click="$store.host.kickPlayer(player.id)"
-					x-text="player.name"
-					:class="player.connected ? '' : 'host-nicknames-disconnected'" />
-			</template>
+		<div x-show="stateID == 1" class="game-container game-start-container">
+			<div class="gamepin-container">
+				<h2 class="gamepin-instructions">Head to <a href="{{.SiteLink}}">{{.SiteLink}}</a> to join!</h2>
+				<br>
+				<h2 class="gamepin-withthe">Game PIN:</h2>
+				<br>
+				<h1 class="gamepin" x-text="$store.host.pin"></h1>
+			</div>
 
-			<button class="btn btn-blue" @click="$store.host.startGame()">Start game</button>
-			<p x-show="startError" class="lighterror"><u>Three</u> players required to start</p>
+			<div class="gameaction-container">
+				<div class="player-counter">
+					<h3 x-text="$store.host.players.length" class="player-counter-number"></h3>
+					<p>Players</p>
+				</div>
+				<p x-show="startError" class="starterror lighterror"><u>Three</u> players required to start</p>
+				<button class="btn btn-blue" :disabled="$store.host.players.length < 3" @click="$store.host.startGame()">Start game</button>
+			</div>
+
+			<div class="player-joins" id="player-joins">
+				<template x-for="player in players">
+					<p class="host-nicknames"
+						@click="$store.host.kickPlayer(player.id)"
+						x-text="player.name"
+						:class="player.connected ? '' : 'host-nicknames-disconnected'" />
+				</template>
+			</div>
+
 		</div>
 
 		<!-- Game start countdown -->

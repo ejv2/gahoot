@@ -19,7 +19,8 @@ func handleHost(c *gin.Context) {
 		Title          string
 		Pin            uint32
 		WebsocketProto string
-	}{WebsocketProto: Config.WSProto()}
+		SiteLink       string
+	}{WebsocketProto: Config.WSProto(), SiteLink: Config.SiteLink}
 
 	spin := c.Param("pin")
 	if spin == "" {

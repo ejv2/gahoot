@@ -102,6 +102,8 @@ func parse(c *Config, path string) error {
 			c.TrustedProxies, err = parseArray(s, &num, trail)
 		case "quiz_dir":
 			c.QuizPath = trail
+		case "site_link":
+			c.SiteLink = trail
 		case "game_timeout":
 			i, e := strconv.ParseInt(trail, 10, 32)
 			c.GameTimeout, err = time.Second*time.Duration(i), e
