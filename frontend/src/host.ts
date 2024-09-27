@@ -6,6 +6,7 @@
  */
 
 import * as common from "./common"
+import * as res from "./res"
 import Alpine from "alpinejs"
 
 // Page lifetime variables
@@ -253,12 +254,26 @@ class HostState {
                         return
                     }
                 }, 1000)
+
+                // Song selection
+                if (this.question.time >= 20) {
+                    res.qmusic_long.play();
+                } else if (this.question.time >= 10) {
+                    res.qmusic.play();
+                } else if (this.question.time >= 5) {
+                    res.qmusic_short.play();
+                } else {
+                    res.qmusic_vshort.play();
+                }
+
                 return this.state
             case "nans":
                 this.gotAnswers++;
                 return this.state
             case "qend":
                 this.stateID = States.QuestionAnswer
+                this.stopAllSongs();
+                res.gong.play();
                 return this.stateFeedback
             default:
                 console.warn("expected question acknowledge, got "+ev.action)
@@ -359,12 +374,22 @@ class HostState {
         })
         common.SendMessage(conn, "kick", id)
     }
+
+    // Stops all possible question songs
+    stopAllSongs(): void {
+        res.stop_media(res.qmusic_long);
+        res.stop_media(res.qmusic);
+        res.stop_media(res.qmusic_short);
+        res.stop_media(res.qmusic_vshort);
+    }
 }
 
 // Main frontend init code
 document.addEventListener("DOMContentLoaded", () => {
     console.log("Gahoot! host scripts loaded")
     console.log("Joining game " + window.pin + " as the host")
+
+    res.preload_media();
 
     // Init our global objects
     host = new HostState(window.pin, window.title)

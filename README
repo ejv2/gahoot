@@ -39,5 +39,21 @@ Always welcome. Please stick to the style guides outlined in the ``.editorconfig
 * Spaces size four for TypeScript
 * Space size 2 for most JSON and all YML files
 
+## Credits
+
+A big thanks is owed to the following who have unknowingly contributed royalty free resources to this project:
+
+"Decisions" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Nerves" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+
+"Gong 91013" from Pixabay
+Licensed under the Pixabay Content License (https://pixabay.com/service/license-summary/)
+https://pixabay.com/sound-effects/gong-91013/
+
 ---
 vim: ft=markdown wrap
