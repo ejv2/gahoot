@@ -499,6 +499,13 @@ p.starterror {
         display: none !important;
 }
 
+.toofast-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+}
+
 .game-answers-title-block {
         display: flex;
         flex-direction: row;
