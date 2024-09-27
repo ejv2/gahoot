@@ -40,4 +40,4 @@ Always welcome. Please stick to the style guides outlined in the ``.editorconfig
 * Space size 2 for most JSON and all YML files
 
 ---
-vim: ft=markdown
+vim: ft=markdown wrap
